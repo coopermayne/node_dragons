@@ -194,9 +194,10 @@ module.exports = Model = (function(_super) {
 });
 
 ;require.register("views/home_view", function(exports, require, module) {
-var HomeView, Turtle, View, template,
+var HomeView, Turtle, View, customTimeInterval, template,
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 View = require('./view');
 
@@ -219,33 +220,78 @@ module.exports = HomeView = (function(_super) {
 })(View);
 
 $(document).ready(function() {
-  var t;
-  t = new Turtle(Math.PI / 3, 0, 2, 7, "F");
+  var angle, distance, maxIterations, rules, startingString, t;
+  distance = 10;
+  maxIterations = 8;
+  angle = Math.PI / 2;
+  startingString = "FX";
+  rules = [
+    {
+      input: 'X',
+      output: 'XrYFr'
+    }, {
+      input: 'Y',
+      output: 'lFXlY'
+    }
+  ];
+  t = new Turtle(angle, 0, distance, 2, rules, startingString);
   t.findPoints();
   t.resizeCanvas();
-  return t.draw();
+  t.draw();
+  $('button').on('click', function() {
+    t.iterations++;
+    t.resetCanvas();
+    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
+    t.findPoints();
+    t.resizeCanvas();
+    t.draw();
+    return console.log('iterations: ' + t.iterations);
+  });
+  return customTimeInterval(2000, function() {
+    if (t.iterations < maxIterations) {
+      t.iterations++;
+    } else {
+      console.log('no more!');
+    }
+    t.resetCanvas();
+    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
+    t.findPoints();
+    t.resizeCanvas();
+    return t.draw();
+  });
 });
+
+customTimeInterval = function(ms, func) {
+  return setInterval(func, ms);
+};
 
 Turtle = (function() {
 
-  function Turtle(d_radians, d_distance, distance, iterations, startingString) {
+  function Turtle(d_radians, d_distance, distance, iterations, rules, startingString) {
     this.d_radians = d_radians;
     this.d_distance = d_distance;
     this.distance = distance;
     this.iterations = iterations;
+    this.rules = rules;
     this.startingString = startingString;
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
     this.radians = 0;
+    this.startingString = startingString;
+    this.string = startingString;
+    this.rules = rules;
     this.maxX = 0;
     this.maxY = 0;
     this.minX = 0;
     this.minY = 0;
-    this.startingString = startingString;
+    this.lastTrans = {
+      x: 0,
+      y: 0
+    };
+    this.lastScaler = 1;
     this.d_radians = d_radians;
     this.distance = distance;
     this.iterations = iterations;
-    this.string = this.generateString();
     this.pos = {
       x: 0,
       y: 0
@@ -254,14 +300,35 @@ Turtle = (function() {
   }
 
   Turtle.prototype.generateString = function() {
-    var num, string;
-    string = "AB";
+    var letter, num, old, rule, ruleInputs, _i, _j, _len, _len1, _ref;
     num = this.iterations;
     while (num -= 1) {
-      string = string.replace(/A/g, 'BlAlB');
-      string = string.replace(/B/g, 'ArBrA');
+      ruleInputs = this.rules.map(function(x) {
+        return x.input;
+      });
+      console.log(ruleInputs);
+      old = this.string;
+      this.string = new String;
+      for (_i = 0, _len = old.length; _i < _len; _i++) {
+        letter = old[_i];
+        console.log(letter);
+        if (__indexOf.call(ruleInputs, letter) >= 0) {
+          _ref = this.rules;
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            rule = _ref[_j];
+            console.log(rule.input === letter);
+            if (letter === rule.input) {
+              this.string = this.string.concat(rule.output);
+              console.log('applied rule');
+            }
+          }
+        } else {
+          this.string = this.string.concat(letter);
+          console.log('added letter');
+        }
+      }
     }
-    return string;
+    return console.log('finished: ' + this.string);
   };
 
   Turtle.prototype.goForward = function() {
@@ -298,13 +365,12 @@ Turtle = (function() {
 
   Turtle.prototype.findPoints = function() {
     var letter, _i, _len, _ref, _results;
+    this.generateString();
     _ref = this.string;
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       letter = _ref[_i];
-      if (letter === 'A') {
-        _results.push(this.goForward());
-      } else if (letter === 'B') {
+      if (/[F]/.test(letter)) {
         _results.push(this.goForward());
       } else if (letter === 'l') {
         _results.push(this.turn('l'));
@@ -320,6 +386,7 @@ Turtle = (function() {
   Turtle.prototype.draw = function() {
     var ctx, newX, newY, point, _i, _len, _ref;
     ctx = this.context;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(this.points[0].x, this.points[0].y);
     _ref = this.points;
@@ -329,28 +396,39 @@ Turtle = (function() {
       newY = point.y;
       ctx.lineTo(newX, newY);
     }
-    ctx.lineWidth = 1;
     return ctx.stroke();
   };
 
+  Turtle.prototype.resetCanvas = function() {
+    console.log('resetting canvas...');
+    this.context.translate(-this.lastTrans.x, -this.lastTrans.y);
+    this.context.scale(1 / this.lastScaler, 1 / this.lastScaler);
+    return this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  };
+
   Turtle.prototype.resizeCanvas = function() {
-    var centerx, centery, dx, dy, height, heightRatio, per, scaler, width, widthRatio;
+    var centerx, centery, dx, dy, height, heightRatio, per, rulesString, scaler, width, widthRatio;
     width = this.maxX - this.minX;
     height = this.maxY - this.minY;
     widthRatio = this.canvas.width / width;
     heightRatio = this.canvas.height / height;
-    console.log(widthRatio, heightRatio);
     per = 1;
     centerx = this.minX + width / 2;
     centery = this.minY + height / 2;
     scaler = Math.min.apply(null, [widthRatio, heightRatio]) * 0.9;
-    this.context.font = "20px Georgia";
-    this.context.fillText("" + (scaler.toFixed(2)) + " times", 10, 30);
-    console.log(scaler);
-    dx = centerx - this.canvas.width / (2 * scaler);
-    dy = centery - this.canvas.height / (2 * scaler);
+    this.lastScaler = scaler;
+    rulesString = this.rules.map(function(z) {
+      return "" + z.input + "->" + z.output;
+    });
+    rulesString = rulesString.join(", ");
+    this.context.font = "15px Georgia";
+    this.context.fillText("" + (scaler.toFixed(2)) + "x,      iteration:" + this.iterations + ",      segments:" + this.points.length + ",      angle:" + ((this.d_radians * 180 / Math.PI).toFixed(1)) + ",      rules:" + rulesString, 10, 20);
+    dx = -1 * (centerx - this.canvas.width / (2 * scaler));
+    dy = -1 * (centery - this.canvas.height / (2 * scaler));
     this.context.scale(scaler, scaler);
-    return this.context.translate(-dx, -dy);
+    this.lastTrans.x = dx;
+    this.lastTrans.y = dy;
+    return this.context.translate(dx, dy);
   };
 
   Turtle.prototype.xBox = function(x1, y1, x2, y2) {
@@ -380,7 +458,7 @@ module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partial
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n  <canvas id=\"canvas\" width=\"512\" height=\"512\"></canvas>\n</div>\n";});
+  return "<div id=\"content\">\n  <canvas id=\"canvas\" width=\"800\" height=\"800\"></canvas>\n  <button>more</button>\n</div>\n";});
 });
 
 ;require.register("views/view", function(exports, require, module) {
