@@ -220,52 +220,53 @@ module.exports = HomeView = (function(_super) {
 })(View);
 
 $(document).ready(function() {
-  var angle, distance, maxIterations, rules, startingString, t;
-  distance = 10;
-  maxIterations = 11;
-  angle = Math.PI / 2;
-  startingString = "FX";
-  rules = [
-    {
-      input: 'X',
-      output: 'XrYFr'
-    }, {
-      input: 'Y',
-      output: 'lFXlY'
-    }
-  ];
-  t = new Turtle(angle, 0, distance, 2, rules, startingString);
+  var options, t;
+  options = {
+    iterations: 2,
+    angle: Math.PI / 2,
+    startingString: "FX",
+    rules: [
+      {
+        input: 'X',
+        output: 'XlYFl'
+      }, {
+        input: 'Y',
+        output: 'rFXrY'
+      }
+    ]
+  };
+  console.log(options);
+  t = new Turtle(options);
   $('button').on('click', function() {
     t.iterations++;
     t.resetCanvas();
-    return t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
+    options.iterations++;
+    return t = new Turtle(options);
   });
-  return customTimeInterval(2000, function() {
+  return customTimeInterval(1000, function() {
+    var maxIterations;
+    maxIterations = 8;
     if (t.iterations < maxIterations) {
       t.iterations++;
       t.resetCanvas();
-      return t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
+      options.iterations++;
+      return t = new Turtle(options);
     }
   });
 });
 
-customTimeInterval = function(ms, func) {
-  return setInterval(func, ms);
-};
-
 Turtle = (function() {
 
-  function Turtle(d_radians, d_distance, distance, iterations, rules, startingString) {
-    this.d_radians = d_radians;
-    this.d_distance = d_distance;
-    this.distance = distance;
-    this.iterations = iterations;
-    this.rules = rules;
-    this.startingString = startingString;
+  function Turtle(options) {
+    this.d_radians = options.angle;
+    this.iterations = options.iterations;
+    this.rules = options.rules;
+    this.startingString = options.startingString;
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
     this.radians = 0;
-    this.string = startingString;
+    this.string = options.startingString;
+    this.distance = 5;
     this.max = {
       x: 0,
       y: 0
@@ -357,7 +358,7 @@ Turtle = (function() {
     _ref = this.string;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       letter = _ref[_i];
-      if (/[F]/.test(letter)) {
+      if (/[ABF]/.test(letter)) {
         this.goForward();
       } else if (letter === 'l') {
         this.turn('l');
@@ -400,7 +401,6 @@ Turtle = (function() {
     var centerx, centery, dx, dy, height, heightRatio, per, rulesString, scaler, width, widthRatio;
     width = this.max.x - this.min.x;
     height = this.max.y - this.min.y;
-    console.log(width, height);
     widthRatio = this.canvas.width / width;
     heightRatio = this.canvas.height / height;
     per = 1;
@@ -440,6 +440,10 @@ Turtle = (function() {
   return Turtle;
 
 })();
+
+customTimeInterval = function(ms, func) {
+  return setInterval(func, ms);
+};
 
 });
 

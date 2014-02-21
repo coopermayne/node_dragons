@@ -5,39 +5,49 @@ module.exports = class HomeView extends View
   id: 'home-view'
   template: template
 
-
 $(document).ready ->
-  distance = 10
-  maxIterations = 11
-  angle = Math.PI/2
-  startingString =  "FX"
-  rules = [
-    {input:'X', output:'XrYFr'}
-    {input:'Y', output:'lFXlY'}
-  ]
-  t = new Turtle(angle, 0, distance, 2, rules, startingString)
+  # sierpinski triangle -- { angle: Math.PI/3, startingString: 'A', rules:[{input:'A', output:'BlAlB'},{input:'B', output:'ArBrA'}] }
+  # dragon -- { angle: Math.PI/2, startingString: 'FX', rules:[{input:'X', output:'XlYFl'},{input:'Y', output:'rFXrY'}] }
+
+  options = {
+    iterations: 2
+    angle: Math.PI/2
+    startingString:  "FX"
+    rules: [
+      {input:'X', output:'XlYFl'}
+      {input:'Y', output:'rFXrY'}
+    ]
+  }
+  console.log options
+
+  t = new Turtle(options)
 
   $('button').on 'click', ->
     t.iterations++
     t.resetCanvas()
-    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString)
+    options.iterations++
+    t = new Turtle(options)
 
-  customTimeInterval 2000, ->
+  customTimeInterval 1000, ->
+    maxIterations = 8
     if t.iterations < maxIterations
       t.iterations++
       t.resetCanvas()
-      t = new Turtle(angle, 0, distance, t.iterations, rules, startingString)
-
-#custom delay function
-customTimeInterval = (ms, func) -> setInterval func, ms
+      options.iterations++
+      t = new Turtle(options)
 
 class Turtle
 
-  constructor: (@d_radians, @d_distance, @distance, @iterations, @rules, @startingString) ->
+  constructor: (options) ->
+    @d_radians = options.angle
+    @iterations = options.iterations
+    @rules = options.rules
+    @startingString = options.startingString
     @canvas = document.getElementById('canvas')
     @context = @canvas.getContext('2d')
     @radians = 0
-    @string = startingString
+    @string = options.startingString
+    @distance = 5
 
     @max = {x:0, y:0}
     @min = {x:0, y:0}
@@ -45,12 +55,13 @@ class Turtle
     @lastTrans = {x:0, y: 0}
     @lastScaler = 1
 
-    @pos = { x: 0, y: 0 }
+    @pos = { x: 0, y: 0 } #turtles position (starts at origin...)
     @points = [$.extend( true, {}, @pos )]
 
-    @findPoints()
-    @resizeCanvas()
-    @draw()
+    #now we actually draw the thing
+    this.findPoints() #gets an array of points that make up the shape
+    this.resizeCanvas() #resize the canvas to fit shape
+    this.draw()
 
   generateString: ->
     t1 = Date.now()
@@ -92,10 +103,10 @@ class Turtle
       @radians = @radians + @d_radians
 
   findPoints: ->
-    @generateString()
+    this.generateString()
     t1 = Date.now()
     for letter in @string
-      if /[F]/.test letter
+      if /[ABF]/.test letter
         @goForward()
       else if letter == 'l'
         @turn 'l'
@@ -134,7 +145,6 @@ class Turtle
 
     width = @max.x - @min.x
     height = @max.y - @min.y
-    console.log(width, height)
 
     widthRatio = @canvas.width/width
     heightRatio = @canvas.height/height
@@ -180,3 +190,7 @@ class Turtle
     ctx.lineTo(x2, y2)
 
     ctx.stroke()
+
+#custom delay function
+customTimeInterval = (ms, func) -> setInterval func, ms
+
