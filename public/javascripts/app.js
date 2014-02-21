@@ -222,7 +222,7 @@ module.exports = HomeView = (function(_super) {
 $(document).ready(function() {
   var angle, distance, maxIterations, rules, startingString, t;
   distance = 10;
-  maxIterations = 8;
+  maxIterations = 11;
   angle = Math.PI / 2;
   startingString = "FX";
   rules = [
@@ -235,29 +235,17 @@ $(document).ready(function() {
     }
   ];
   t = new Turtle(angle, 0, distance, 2, rules, startingString);
-  t.findPoints();
-  t.resizeCanvas();
-  t.draw();
   $('button').on('click', function() {
     t.iterations++;
     t.resetCanvas();
-    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
-    t.findPoints();
-    t.resizeCanvas();
-    t.draw();
-    return console.log('iterations: ' + t.iterations);
+    return t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
   });
   return customTimeInterval(2000, function() {
     if (t.iterations < maxIterations) {
       t.iterations++;
-    } else {
-      console.log('no more!');
+      t.resetCanvas();
+      return t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
     }
-    t.resetCanvas();
-    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString);
-    t.findPoints();
-    t.resizeCanvas();
-    return t.draw();
   });
 });
 
@@ -297,38 +285,38 @@ Turtle = (function() {
       y: 0
     };
     this.points = [$.extend(true, {}, this.pos)];
+    this.findPoints();
+    this.resizeCanvas();
+    this.draw();
   }
 
   Turtle.prototype.generateString = function() {
-    var letter, num, old, rule, ruleInputs, _i, _j, _len, _len1, _ref;
+    var letter, num, old, rule, ruleInputs, t1, t2, _i, _j, _len, _len1, _ref;
+    t1 = Date.now();
     num = this.iterations;
     while (num -= 1) {
       ruleInputs = this.rules.map(function(x) {
         return x.input;
       });
-      console.log(ruleInputs);
       old = this.string;
       this.string = new String;
       for (_i = 0, _len = old.length; _i < _len; _i++) {
         letter = old[_i];
-        console.log(letter);
         if (__indexOf.call(ruleInputs, letter) >= 0) {
           _ref = this.rules;
           for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
             rule = _ref[_j];
-            console.log(rule.input === letter);
             if (letter === rule.input) {
               this.string = this.string.concat(rule.output);
-              console.log('applied rule');
             }
           }
         } else {
           this.string = this.string.concat(letter);
-          console.log('added letter');
         }
       }
     }
-    return console.log('finished: ' + this.string);
+    t2 = Date.now();
+    return console.log('generateString: ' + (t2 - t1) / 1000 + ' sec');
   };
 
   Turtle.prototype.goForward = function() {
@@ -364,29 +352,30 @@ Turtle = (function() {
   };
 
   Turtle.prototype.findPoints = function() {
-    var letter, _i, _len, _ref, _results;
+    var letter, t1, t2, _i, _len, _ref;
     this.generateString();
+    t1 = Date.now();
     _ref = this.string;
-    _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       letter = _ref[_i];
       if (/[F]/.test(letter)) {
-        _results.push(this.goForward());
+        this.goForward();
       } else if (letter === 'l') {
-        _results.push(this.turn('l'));
+        this.turn('l');
       } else if (letter === 'r') {
-        _results.push(this.turn('r'));
-      } else {
-        _results.push(void 0);
+        this.turn('r');
       }
     }
-    return _results;
+    t2 = Date.now();
+    return console.log('findPoints: ' + (t2 - t1) / 1000 + ' sec');
   };
 
   Turtle.prototype.draw = function() {
-    var ctx, newX, newY, point, _i, _len, _ref;
+    var ctx, newX, newY, point, t1, t2, _i, _len, _ref;
+    t1 = Date.now();
     ctx = this.context;
     ctx.lineWidth = 1;
+    ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(this.points[0].x, this.points[0].y);
     _ref = this.points;
@@ -396,7 +385,9 @@ Turtle = (function() {
       newY = point.y;
       ctx.lineTo(newX, newY);
     }
-    return ctx.stroke();
+    ctx.stroke();
+    t2 = Date.now();
+    return console.log('draw: ' + (t2 - t1) / 1000 + ' sec');
   };
 
   Turtle.prototype.resetCanvas = function() {

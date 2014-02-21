@@ -8,7 +8,7 @@ module.exports = class HomeView extends View
 
 $(document).ready ->
   distance = 10
-  maxIterations = 8
+  maxIterations = 11
   angle = Math.PI/2
   startingString =  "FX"
   rules = [
@@ -16,31 +16,17 @@ $(document).ready ->
     {input:'Y', output:'lFXlY'}
   ]
   t = new Turtle(angle, 0, distance, 2, rules, startingString)
-  t.findPoints()
-  t.resizeCanvas()
-  t.draw()
 
   $('button').on 'click', ->
     t.iterations++
     t.resetCanvas()
     t = new Turtle(angle, 0, distance, t.iterations, rules, startingString)
-    t.findPoints()
-    #t.xBox(0,0,t.canvas.width, t.canvas.height)
-    t.resizeCanvas()
-    t.draw()
-    console.log 'iterations: ' + t.iterations
 
   customTimeInterval 2000, ->
     if t.iterations < maxIterations
       t.iterations++
-    else
-      console.log 'no more!'
-    t.resetCanvas()
-    t = new Turtle(angle, 0, distance, t.iterations, rules, startingString)
-    t.findPoints()
-    #t.xBox(0,0,t.canvas.width, t.canvas.height)
-    t.resizeCanvas()
-    t.draw()
+      t.resetCanvas()
+      t = new Turtle(angle, 0, distance, t.iterations, rules, startingString)
 
 #custom delay function
 customTimeInterval = (ms, func) -> setInterval func, ms
@@ -67,27 +53,29 @@ class Turtle
     this.pos = { x: 0, y: 0 }
     this.points = [$.extend( true, {}, this.pos )]
 
+    this.findPoints()
+    this.resizeCanvas()
+    this.draw()
+
   generateString: ->
+    t1 = Date.now()
     num = @iterations
 
     while num -= 1
       ruleInputs = this.rules.map (x) -> x.input
-      console.log ruleInputs
       old = this.string
       this.string = new String
       for letter in old
-        console.log letter
         if letter in ruleInputs
           for rule in this.rules
-            console.log rule.input==letter
             if letter == rule.input
               this.string = this.string.concat rule.output
-              console.log 'applied rule'
         else
           this.string = this.string.concat letter
-          console.log 'added letter'
 
-    console.log 'finished: ' + this.string
+    #console.log 'finished: ' + this.string
+    t2 = Date.now()
+    console.log 'generateString: ' + ( t2-t1 )/ 1000 + ' sec'
 
   goForward: ->
     newX = this.distance * Math.cos(this.radians) + this.pos.x
@@ -110,6 +98,7 @@ class Turtle
 
   findPoints: ->
     this.generateString()
+    t1 = Date.now()
     for letter in this.string
       if /[F]/.test letter
         this.goForward()
@@ -117,9 +106,15 @@ class Turtle
         this.turn 'l'
       else if letter == 'r'
         this.turn 'r'
+    t2 = Date.now()
+    console.log 'findPoints: ' + ( t2-t1 )/ 1000 + ' sec'
+
   draw: ->
+
+    t1 = Date.now()
     ctx = this.context
     ctx.lineWidth = 1
+    ctx.lineJoin = 'round'
     ctx.beginPath()
     ctx.moveTo(this.points[0].x, this.points[0].y)
     for point in this.points
@@ -127,6 +122,8 @@ class Turtle
       newY = point.y
       ctx.lineTo(newX,newY)
     ctx.stroke()
+    t2 = Date.now()
+    console.log 'draw: ' + ( t2-t1 )/ 1000 + ' sec'
 
   resetCanvas: ->
     console.log('resetting canvas...')
