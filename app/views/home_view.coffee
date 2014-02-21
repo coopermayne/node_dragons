@@ -34,90 +34,85 @@ customTimeInterval = (ms, func) -> setInterval func, ms
 class Turtle
 
   constructor: (@d_radians, @d_distance, @distance, @iterations, @rules, @startingString) ->
-    this.canvas = document.getElementById('canvas')
-    this.context = this.canvas.getContext('2d')
-    this.radians = 0
-    this.startingString = startingString
-    this.string = startingString
-    this.rules = rules
-    this.maxX = 0
-    this.maxY = 0
-    this.minX = 0
-    this.minY = 0
-    this.lastTrans = {x:0, y: 0}
-    this.lastScaler = 1
+    @canvas = document.getElementById('canvas')
+    @context = @canvas.getContext('2d')
+    @radians = 0
+    @string = startingString
 
-    this.d_radians = d_radians
-    this.distance = distance
-    this.iterations = iterations
-    this.pos = { x: 0, y: 0 }
-    this.points = [$.extend( true, {}, this.pos )]
+    @max = {x:0, y:0}
+    @min = {x:0, y:0}
 
-    this.findPoints()
-    this.resizeCanvas()
-    this.draw()
+    @lastTrans = {x:0, y: 0}
+    @lastScaler = 1
+
+    @pos = { x: 0, y: 0 }
+    @points = [$.extend( true, {}, @pos )]
+
+    @findPoints()
+    @resizeCanvas()
+    @draw()
 
   generateString: ->
     t1 = Date.now()
     num = @iterations
 
     while num -= 1
-      ruleInputs = this.rules.map (x) -> x.input
-      old = this.string
-      this.string = new String
+      ruleInputs = @rules.map (x) -> x.input
+      old = @string
+      @string = new String
       for letter in old
         if letter in ruleInputs
-          for rule in this.rules
+          for rule in @rules
             if letter == rule.input
-              this.string = this.string.concat rule.output
+              @string = @string.concat rule.output
         else
-          this.string = this.string.concat letter
+          @string = @string.concat letter
 
-    #console.log 'finished: ' + this.string
+    #console.log 'finished: ' + @string
     t2 = Date.now()
     console.log 'generateString: ' + ( t2-t1 )/ 1000 + ' sec'
 
   goForward: ->
-    newX = this.distance * Math.cos(this.radians) + this.pos.x
-    newY = this.distance * Math.sin(this.radians) + this.pos.y
+    newX = @distance * Math.cos(@radians) + @pos.x
+    newY = @distance * Math.sin(@radians) + @pos.y
 
-    this.points.push({x: newX, y: newY})
+    @points.push({x: newX, y: newY})
 
-    this.maxX = newX if newX > this.maxX
-    this.maxY = newY if newY > this.maxY
-    this.minX = newX if newX < this.minX
-    this.minY = newY if newY < this.minY
-    this.pos.x = newX
-    this.pos.y = newY
+    @max.x = newX if newX > @max.x
+    @max.y = newY if newY > @max.y
+    @min.x = newX if newX < @min.x
+    @min.y = newY if newY < @min.y
+    @pos.x = newX
+    @pos.y = newY
 
   turn: (direction) ->
     if direction == 'r'
-      this.radians = this.radians - this.d_radians
+      @radians = @radians - @d_radians
     else if direction == 'l'
-      this.radians = this.radians + this.d_radians
+      @radians = @radians + @d_radians
 
   findPoints: ->
-    this.generateString()
+    @generateString()
     t1 = Date.now()
-    for letter in this.string
+    for letter in @string
       if /[F]/.test letter
-        this.goForward()
+        @goForward()
       else if letter == 'l'
-        this.turn 'l'
+        @turn 'l'
       else if letter == 'r'
-        this.turn 'r'
+        @turn 'r'
     t2 = Date.now()
     console.log 'findPoints: ' + ( t2-t1 )/ 1000 + ' sec'
 
   draw: ->
 
     t1 = Date.now()
-    ctx = this.context
+    ctx = @context
     ctx.lineWidth = 1
     ctx.lineJoin = 'round'
     ctx.beginPath()
-    ctx.moveTo(this.points[0].x, this.points[0].y)
-    for point in this.points
+    ctx.moveTo(@points[0].x, @points[0].y)
+    for point in @points
       newX = point.x
       newY = point.y
       ctx.lineTo(newX,newY)
@@ -127,52 +122,53 @@ class Turtle
 
   resetCanvas: ->
     console.log('resetting canvas...')
-    this.context.translate(-this.lastTrans.x,-this.lastTrans.y)
-    this.context.scale(1/this.lastScaler, 1/this.lastScaler)
-    this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
+    @context.translate(-@lastTrans.x,-@lastTrans.y)
+    @context.scale(1/@lastScaler, 1/@lastScaler)
+    @context.clearRect(0,0,@canvas.width,@canvas.height)
     #console.log 'drawing cross'
-    #this.xBox(0,0,this.canvas.width, this.canvas.height)
+    #@xBox(0,0,@canvas.width, @canvas.height)
 
   resizeCanvas: ->
     #guide
     #
 
-    width = this.maxX - this.minX
-    height = this.maxY - this.minY
+    width = @max.x - @min.x
+    height = @max.y - @min.y
+    console.log(width, height)
 
-    widthRatio = this.canvas.width/width
-    heightRatio = this.canvas.height/height
+    widthRatio = @canvas.width/width
+    heightRatio = @canvas.height/height
     #console.log widthRatio, heightRatio
 
     per = 1
 
-    centerx = this.minX + width/2
-    centery = this.minY + height/2
+    centerx = @min.x + width/2
+    centery = @min.y + height/2
     scaler = Math.min.apply(null,[widthRatio, heightRatio])*0.9
-    this.lastScaler = scaler
-    rulesString = this.rules.map (z) ->
+    @lastScaler = scaler
+    rulesString = @rules.map (z) ->
       return "#{z.input}->#{z.output}"
     rulesString = rulesString.join(", ")
-    this.context.font="15px Georgia"
-    this.context.fillText(
+    @context.font="15px Georgia"
+    @context.fillText(
       "#{scaler.toFixed(2)}x,
-      iteration:#{this.iterations},
-      segments:#{this.points.length},
-      angle:#{( this.d_radians * 180/Math.PI ).toFixed(1)},
+      iteration:#{@iterations},
+      segments:#{@points.length},
+      angle:#{( @d_radians * 180/Math.PI ).toFixed(1)},
       rules:#{rulesString}",
       10,
       20
     )
 
-    dx = -1*(centerx - this.canvas.width/(2*scaler))
-    dy = -1*(centery - this.canvas.height/(2*scaler))
-    this.context.scale(scaler,scaler)
-    this.lastTrans.x = dx
-    this.lastTrans.y = dy
-    this.context.translate(dx, dy)
+    dx = -1*(centerx - @canvas.width/(2*scaler))
+    dy = -1*(centery - @canvas.height/(2*scaler))
+    @context.scale(scaler,scaler)
+    @lastTrans.x = dx
+    @lastTrans.y = dy
+    @context.translate(dx, dy)
 
   xBox: (x1,y1,x2,y2) ->
-    ctx = this.context
+    ctx = @context
     ctx.beginPath()
     ctx.moveTo(x1, y2)
     ctx.lineTo(x2, y2)

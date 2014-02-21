@@ -265,21 +265,20 @@ Turtle = (function() {
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
     this.radians = 0;
-    this.startingString = startingString;
     this.string = startingString;
-    this.rules = rules;
-    this.maxX = 0;
-    this.maxY = 0;
-    this.minX = 0;
-    this.minY = 0;
+    this.max = {
+      x: 0,
+      y: 0
+    };
+    this.min = {
+      x: 0,
+      y: 0
+    };
     this.lastTrans = {
       x: 0,
       y: 0
     };
     this.lastScaler = 1;
-    this.d_radians = d_radians;
-    this.distance = distance;
-    this.iterations = iterations;
     this.pos = {
       x: 0,
       y: 0
@@ -327,17 +326,17 @@ Turtle = (function() {
       x: newX,
       y: newY
     });
-    if (newX > this.maxX) {
-      this.maxX = newX;
+    if (newX > this.max.x) {
+      this.max.x = newX;
     }
-    if (newY > this.maxY) {
-      this.maxY = newY;
+    if (newY > this.max.y) {
+      this.max.y = newY;
     }
-    if (newX < this.minX) {
-      this.minX = newX;
+    if (newX < this.min.x) {
+      this.min.x = newX;
     }
-    if (newY < this.minY) {
-      this.minY = newY;
+    if (newY < this.min.y) {
+      this.min.y = newY;
     }
     this.pos.x = newX;
     return this.pos.y = newY;
@@ -399,13 +398,14 @@ Turtle = (function() {
 
   Turtle.prototype.resizeCanvas = function() {
     var centerx, centery, dx, dy, height, heightRatio, per, rulesString, scaler, width, widthRatio;
-    width = this.maxX - this.minX;
-    height = this.maxY - this.minY;
+    width = this.max.x - this.min.x;
+    height = this.max.y - this.min.y;
+    console.log(width, height);
     widthRatio = this.canvas.width / width;
     heightRatio = this.canvas.height / height;
     per = 1;
-    centerx = this.minX + width / 2;
-    centery = this.minY + height / 2;
+    centerx = this.min.x + width / 2;
+    centery = this.min.y + height / 2;
     scaler = Math.min.apply(null, [widthRatio, heightRatio]) * 0.9;
     this.lastScaler = scaler;
     rulesString = this.rules.map(function(z) {
