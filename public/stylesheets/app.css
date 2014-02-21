@@ -64,30 +64,27 @@ td { vertical-align: top; }
 
 .chromeframe { margin: 0.2em 0; background: #ccc; color: black; padding: 0.2em 0; }
 
-* {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-#home-view {
-  width: 800px;
-  margin: 0 auto;
-}
-h1 {
-  padding-left: 138px;
-  margin-bottom: 0.5em;
-  font-size: 5em;
-  color: #fff;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  background-color: #91a2c0;
-  background-image: url("http://brunch.io/images/brunch.png");
-  background-repeat: no-repeat;
-  background-position: 2px;
+body {
+  background: #808080;
 }
 canvas {
-  border: 2px #000 solid;
+  background: #000;
+  width: 100%;
+}
+button {
+  font-size: 20px;
+  float: right;
+}
+#home-view {
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
+}
+#info {
+  font-size: 20px;
+  color: #fff;
+  background: #000;
+  padding: 7px;
 }
 
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; *line-height: 0; }

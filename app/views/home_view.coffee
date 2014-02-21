@@ -6,19 +6,15 @@ module.exports = class HomeView extends View
   template: template
 
 $(document).ready ->
-  # sierpinski triangle -- { angle: Math.PI/3, startingString: 'A', rules:[{input:'A', output:'BlAlB'},{input:'B', output:'ArBrA'}] }
-  # dragon -- { angle: Math.PI/2, startingString: 'FX', rules:[{input:'X', output:'XlYFl'},{input:'Y', output:'rFXrY'}] }
 
-  options = {
-    iterations: 2
-    angle: Math.PI/2
-    startingString:  "FX"
+  options =
     rules: [
       {input:'X', output:'XlYFl'}
       {input:'Y', output:'rFXrY'}
     ]
-  }
-  console.log options
+    iterations: 2
+    angle: Math.PI/2
+    startingString:  "FX"
 
   t = new Turtle(options)
 
@@ -53,18 +49,18 @@ class Turtle
     @min = {x:0, y:0}
 
     @lastTrans = {x:0, y: 0}
-    @lastScaler = 1
+    @scaler = 1
 
     @pos = { x: 0, y: 0 } #turtles position (starts at origin...)
     @points = [$.extend( true, {}, @pos )]
 
     #now we actually draw the thing
-    this.findPoints() #gets an array of points that make up the shape
-    this.resizeCanvas() #resize the canvas to fit shape
-    this.draw()
+    customTimer(this.generateString, 'generate string', this)
+    customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
+    this.resizeCanvas()  #resize the canvas to fit shape
+    customTimer(this.draw, 'draw', this)
 
   generateString: ->
-    t1 = Date.now()
     num = @iterations
 
     while num -= 1
@@ -78,10 +74,6 @@ class Turtle
               @string = @string.concat rule.output
         else
           @string = @string.concat letter
-
-    #console.log 'finished: ' + @string
-    t2 = Date.now()
-    console.log 'generateString: ' + ( t2-t1 )/ 1000 + ' sec'
 
   goForward: ->
     newX = @distance * Math.cos(@radians) + @pos.x
@@ -103,8 +95,7 @@ class Turtle
       @radians = @radians + @d_radians
 
   findPoints: ->
-    this.generateString()
-    t1 = Date.now()
+
     for letter in @string
       if /[ABF]/.test letter
         @goForward()
@@ -112,14 +103,11 @@ class Turtle
         @turn 'l'
       else if letter == 'r'
         @turn 'r'
-    t2 = Date.now()
-    console.log 'findPoints: ' + ( t2-t1 )/ 1000 + ' sec'
 
   draw: ->
-
-    t1 = Date.now()
     ctx = @context
     ctx.lineWidth = 1
+    ctx.strokeStyle= 'white'
     ctx.lineJoin = 'round'
     ctx.beginPath()
     ctx.moveTo(@points[0].x, @points[0].y)
@@ -128,69 +116,55 @@ class Turtle
       newY = point.y
       ctx.lineTo(newX,newY)
     ctx.stroke()
-    t2 = Date.now()
-    console.log 'draw: ' + ( t2-t1 )/ 1000 + ' sec'
 
   resetCanvas: ->
-    console.log('resetting canvas...')
     @context.translate(-@lastTrans.x,-@lastTrans.y)
-    @context.scale(1/@lastScaler, 1/@lastScaler)
+    @context.scale(1/@scaler, 1/@scaler)
     @context.clearRect(0,0,@canvas.width,@canvas.height)
-    #console.log 'drawing cross'
-    #@xBox(0,0,@canvas.width, @canvas.height)
 
   resizeCanvas: ->
-    #guide
-    #
-
     width = @max.x - @min.x
     height = @max.y - @min.y
+    center =
+      x: @min.x + width/2
+      y: @min.y + height/2
 
     widthRatio = @canvas.width/width
     heightRatio = @canvas.height/height
-    #console.log widthRatio, heightRatio
 
-    per = 1
+    @scaler = Math.min.apply(null,[widthRatio, heightRatio, 15])*0.9
 
-    centerx = @min.x + width/2
-    centery = @min.y + height/2
-    scaler = Math.min.apply(null,[widthRatio, heightRatio])*0.9
-    @lastScaler = scaler
     rulesString = @rules.map (z) ->
       return "#{z.input}->#{z.output}"
     rulesString = rulesString.join(", ")
-    @context.font="15px Georgia"
-    @context.fillText(
-      "#{scaler.toFixed(2)}x,
-      iteration:#{@iterations},
-      segments:#{@points.length},
-      angle:#{( @d_radians * 180/Math.PI ).toFixed(1)},
-      rules:#{rulesString}",
-      10,
-      20
-    )
 
-    dx = -1*(centerx - @canvas.width/(2*scaler))
-    dy = -1*(centery - @canvas.height/(2*scaler))
-    @context.scale(scaler,scaler)
+    text =
+      "#{@scaler.toFixed(2)}x,
+      iteration:  #{@iterations},
+      segments:   #{@points.length},
+      angle:      #{@d_radians.toDegrees()},
+      rules:      #{rulesString}"
+    $('#info span').text(text)
+
+    dx = -1*(center.x - @canvas.width/(2*@scaler))
+    dy = -1*(center.y- @canvas.height/(2*@scaler))
+    @context.scale(@scaler,@scaler)
     @lastTrans.x = dx
     @lastTrans.y = dy
     @context.translate(dx, dy)
 
-  xBox: (x1,y1,x2,y2) ->
-    ctx = @context
-    ctx.beginPath()
-    ctx.moveTo(x1, y2)
-    ctx.lineTo(x2, y2)
-    ctx.lineTo(x2, y1)
-    ctx.lineTo(x1, y1)
-    ctx.lineTo(x1, y2)
-    ctx.lineTo(x2, y1)
-    ctx.moveTo(x1, y1)
-    ctx.lineTo(x2, y2)
-
-    ctx.stroke()
-
-#custom delay function
+#-- Custom Functions
 customTimeInterval = (ms, func) -> setInterval func, ms
+
+Number.prototype.toDegrees =  ->
+  ( this * 180/Math.PI ).toFixed(1)
+
+customTimer = (func, desc, context) ->
+  t1 = Date.now()
+  func.apply(context)
+  t2 = Date.now()
+  console.log desc + ": " + ( t2-t1 )/ 1000 + ' sec'
+
+# sierpinski triangle -- options = { angle: Math.PI/3, startingString: 'A', rules:[{input:'A', output:'BlAlB'},{input:'B', output:'ArBrA'}] }
+# dragon -- options = { angle: Math.PI/2, startingString: 'FX', rules:[{input:'X', output:'XlYFl'},{input:'Y', output:'rFXrY'}] }
 

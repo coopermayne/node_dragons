@@ -4,23 +4,25 @@
 
 // Apply a natural box layout model to all elements.
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
-*
-  box-sizing: border-box
+body
+  background: grey
+
+canvas
+  background: black
+  width: 100%
+
+button
+  font-size: 20px
+  float: right
+  
 
 #home-view
-  width: 800px
+  width: 100%
+  max-width: 800px
   margin: 0 auto
 
-h1
-  padding-left: 138px
-  margin-bottom: 0.5em
-  font-size: 5em
-  color: #fff
-  border-radius: 5px
-  background-color: #91a2c0
-  background-image: url('http://brunch.io/images/brunch.png')
-  background-repeat: no-repeat
-  background-position: 2px
-canvas
-  border: 2px black solid
-  margin: 0 auto
+#info
+  font-size: 20px
+  color: white
+  background: black
+  padding: 7px
