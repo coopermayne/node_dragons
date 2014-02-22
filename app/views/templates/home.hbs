@@ -1,6 +1,35 @@
 <div id="content">
+
+  <form id='params'>
+
+    <label>angle</label>
+    <input type="text" name="angle" value="90" id="angle">
+
+    <label>iterations</label>
+    <input type="text" name="iterations" value="5" id="iterations">
+    
+    <label>string</label>
+    <input type="text" name="startingString" value="FX" id="startingString">
+
+    <label>r1</label>
+    <input type="text" name="r1_input" value="X" id="r1_input">
+    
+    <label>=></label>
+    <input class='output' type="text" name="r1_output" value="X" id="r1_output">
+
+    <label>r2</label>
+    <input type="text" name="r2_input" value="X" id="r2_input">
+
+    <label>=></label>
+    <input class='output' type="text" name="r2_output" value="X" id="r2_output">
+
+    <input type="submit" value="Go">
+  </form>
+
   <div id='info'><span>generating...</span>
     <button>+</button>
   </div>
-  <canvas id="canvas" width="800" height="800"></canvas>
+
+  <canvas id="canvas" width="700" height="700"></canvas>
+
 </div>

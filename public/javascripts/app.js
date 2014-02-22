@@ -194,7 +194,7 @@ module.exports = Model = (function(_super) {
 });
 
 ;require.register("views/home_view", function(exports, require, module) {
-var HomeView, Turtle, View, customTimeInterval, customTimer, template,
+var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, options, sierpinksiTriangle, template,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -221,35 +221,21 @@ module.exports = HomeView = (function(_super) {
 
 $(document).ready(function() {
   var options, t;
-  options = {
-    rules: [
-      {
-        input: 'X',
-        output: 'XlYFl'
-      }, {
-        input: 'Y',
-        output: 'rFXrY'
-      }
-    ],
-    iterations: 2,
-    angle: Math.PI / 2,
-    startingString: "FX"
-  };
+  options = dragon;
   t = new Turtle(options);
+  $(window).on('keypress', function(e) {
+    if (e.charCode === 110) {
+      return t.drawNextIteration();
+    }
+  });
   $('button').on('click', function() {
-    t.iterations++;
-    t.resetCanvas();
-    options.iterations++;
-    return t = new Turtle(options);
+    return t.drawNextIteration();
   });
   return customTimeInterval(1000, function() {
     var maxIterations;
     maxIterations = 8;
     if (t.iterations < maxIterations) {
-      t.iterations++;
-      t.resetCanvas();
-      options.iterations++;
-      return t = new Turtle(options);
+      return t.drawNextIteration();
     }
   });
 });
@@ -257,6 +243,8 @@ $(document).ready(function() {
 Turtle = (function() {
 
   function Turtle(options) {
+    this.distance = 5;
+    this.distanceMultiplier = options.distanceMultiplier || 1;
     this.d_radians = options.angle;
     this.iterations = options.iterations;
     this.rules = options.rules;
@@ -265,7 +253,6 @@ Turtle = (function() {
     this.context = this.canvas.getContext('2d');
     this.radians = 0;
     this.string = options.startingString;
-    this.distance = 5;
     this.max = {
       x: 0,
       y: 0
@@ -287,7 +274,7 @@ Turtle = (function() {
     customTimer(this.generateString, 'generate string', this);
     customTimer(this.findPoints, 'find points', this);
     this.resizeCanvas();
-    customTimer(this.draw, 'draw', this);
+    customTimer(this.draw, 'drawAnimate', this);
   }
 
   Turtle.prototype.generateString = function() {
@@ -332,6 +319,7 @@ Turtle = (function() {
 
   Turtle.prototype.goForward = function() {
     var newX, newY;
+    this.distance = this.distance * this.distanceMultiplier;
     newX = this.distance * Math.cos(this.radians) + this.pos.x;
     newY = this.distance * Math.sin(this.radians) + this.pos.y;
     this.points.push({
@@ -384,8 +372,8 @@ Turtle = (function() {
   Turtle.prototype.draw = function() {
     var ctx, newX, newY, point, _i, _len, _ref;
     ctx = this.context;
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 5 / this.scaler;
+    ctx.strokeStyle = 'purple';
     ctx.lineJoin = 'round';
     ctx.beginPath();
     ctx.moveTo(this.points[0].x, this.points[0].y);
@@ -402,7 +390,26 @@ Turtle = (function() {
   Turtle.prototype.resetCanvas = function() {
     this.context.translate(-this.lastTrans.x, -this.lastTrans.y);
     this.context.scale(1 / this.scaler, 1 / this.scaler);
-    return this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.string = this.startingString;
+    this.max = {
+      x: 0,
+      y: 0
+    };
+    this.min = {
+      x: 0,
+      y: 0
+    };
+    this.lastTrans = {
+      x: 0,
+      y: 0
+    };
+    this.scaler = 1;
+    this.pos = {
+      x: 0,
+      y: 0
+    };
+    return this.points = [$.extend(true, {}, this.pos)];
   };
 
   Turtle.prototype.resizeCanvas = function() {
@@ -430,6 +437,15 @@ Turtle = (function() {
     return this.context.translate(dx, dy);
   };
 
+  Turtle.prototype.drawNextIteration = function() {
+    this.resetCanvas();
+    this.iterations++;
+    customTimer(this.generateString, 'generate string', this);
+    customTimer(this.findPoints, 'find points', this);
+    this.resizeCanvas();
+    return customTimer(this.draw, 'drawAnimate', this);
+  };
+
   return Turtle;
 
 })();
@@ -450,6 +466,52 @@ customTimer = function(func, desc, context) {
   return console.log(desc + ": " + (t2 - t1) / 1000 + ' sec');
 };
 
+sierpinksiTriangle = {
+  rules: [
+    {
+      input: 'A',
+      output: 'BlAlB'
+    }, {
+      input: 'B',
+      output: 'ArBrA'
+    }
+  ],
+  iterations: 2,
+  angle: Math.PI / 3,
+  startingString: 'A'
+};
+
+dragon = {
+  rules: [
+    {
+      input: 'X',
+      output: 'XlYFl'
+    }, {
+      input: 'Y',
+      output: 'rFXrY'
+    }
+  ],
+  iterations: 2,
+  angle: Math.PI / 2,
+  distanceMultiplier: 1.0005,
+  startingString: "FX"
+};
+
+options = {
+  rules: [
+    {
+      input: 'X',
+      output: 'XlYFl'
+    }, {
+      input: 'Y',
+      output: 'rFXrY'
+    }
+  ],
+  iterations: 2,
+  angle: Math.PI / 2,
+  startingString: "FX"
+};
+
 });
 
 ;require.register("views/templates/home", function(exports, require, module) {
@@ -458,7 +520,7 @@ module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partial
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n  <div id='info'><span>generating...</span>\n    <button>+</button>\n  </div>\n  <canvas id=\"canvas\" width=\"800\" height=\"800\"></canvas>\n</div>\n";});
+  return "<div id=\"content\">\n\n  <form id='params'>\n\n    <label>angle</label>\n    <input type=\"text\" name=\"angle\" value=\"90\" id=\"angle\">\n\n    <label>iterations</label>\n    <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n    \n    <label>string</label>\n    <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n\n    <label>r1</label>\n    <input type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n    \n    <label>=></label>\n    <input class='output' type=\"text\" name=\"r1_output\" value=\"X\" id=\"r1_output\">\n\n    <label>r2</label>\n    <input type=\"text\" name=\"r2_input\" value=\"X\" id=\"r2_input\">\n\n    <label>=></label>\n    <input class='output' type=\"text\" name=\"r2_output\" value=\"X\" id=\"r2_output\">\n\n    <input type=\"submit\" value=\"Go\">\n  </form>\n\n  <div id='info'><span>generating...</span>\n    <button>+</button>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
 });
 
 ;require.register("views/view", function(exports, require, module) {

@@ -6,44 +6,39 @@ module.exports = class HomeView extends View
   template: template
 
 $(document).ready ->
-
-  options =
-    rules: [
-      {input:'X', output:'XlYFl'}
-      {input:'Y', output:'rFXrY'}
-    ]
-    iterations: 2
-    angle: Math.PI/2
-    startingString:  "FX"
-
+  #TODO connect with form
+  options = dragon
   t = new Turtle(options)
 
+  $(window).on 'keypress', (e)->
+    if e.charCode == 110
+      t.drawNextIteration()
+
   $('button').on 'click', ->
-    t.iterations++
-    t.resetCanvas()
-    options.iterations++
-    t = new Turtle(options)
+    t.drawNextIteration()
+
+    #t.iterations++
+    #t.resetCanvas()
+    #options.iterations++
+    #t = new Turtle(options)
 
   customTimeInterval 1000, ->
     maxIterations = 8
     if t.iterations < maxIterations
-      t.iterations++
-      t.resetCanvas()
-      options.iterations++
-      t = new Turtle(options)
+      t.drawNextIteration()
 
 class Turtle
-
   constructor: (options) ->
+    @distance = 5
+    @distanceMultiplier = options.distanceMultiplier || 1
     @d_radians = options.angle
     @iterations = options.iterations
     @rules = options.rules
     @startingString = options.startingString
     @canvas = document.getElementById('canvas')
     @context = @canvas.getContext('2d')
-    @radians = 0
+    @radians = 0 #starting angle of t.... (east)
     @string = options.startingString
-    @distance = 5
 
     @max = {x:0, y:0}
     @min = {x:0, y:0}
@@ -58,8 +53,7 @@ class Turtle
     customTimer(this.generateString, 'generate string', this)
     customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
-    customTimer(this.draw, 'draw', this)
-
+    customTimer(this.draw, 'drawAnimate', this)
   generateString: ->
     num = @iterations
 
@@ -74,8 +68,8 @@ class Turtle
               @string = @string.concat rule.output
         else
           @string = @string.concat letter
-
   goForward: ->
+    @distance = @distance * @distanceMultiplier
     newX = @distance * Math.cos(@radians) + @pos.x
     newY = @distance * Math.sin(@radians) + @pos.y
 
@@ -87,13 +81,11 @@ class Turtle
     @min.y = newY if newY < @min.y
     @pos.x = newX
     @pos.y = newY
-
   turn: (direction) ->
     if direction == 'r'
       @radians = @radians - @d_radians
     else if direction == 'l'
       @radians = @radians + @d_radians
-
   findPoints: ->
 
     for letter in @string
@@ -104,10 +96,28 @@ class Turtle
       else if letter == 'r'
         @turn 'r'
 
+  #drawAnimate: ->
+    #ctx = @context
+    #ctx.lineWidth = 1/@scaler
+    #ctx.strokeStyle= 'purple'
+    #ctx.lineJoin = 'round'
+    #ctx.beginPath()
+    #ctx.moveTo(@points[0].x, @points[0].y)
+    #i = 0
+    #p = @points
+    #setInterval ->
+      ##draw each segment
+      #i++
+      #newX = p[i].x
+      #newY = p[i].y
+      #ctx.lineTo(newX,newY)
+      #ctx.stroke()
+    #,1000
+
   draw: ->
     ctx = @context
-    ctx.lineWidth = 1
-    ctx.strokeStyle= 'white'
+    ctx.lineWidth = 5/@scaler
+    ctx.strokeStyle= 'purple'
     ctx.lineJoin = 'round'
     ctx.beginPath()
     ctx.moveTo(@points[0].x, @points[0].y)
@@ -118,9 +128,24 @@ class Turtle
     ctx.stroke()
 
   resetCanvas: ->
+    # undo the transformations that you made when
+    # plotting... this way everything is ready
+    # for next iteration
     @context.translate(-@lastTrans.x,-@lastTrans.y)
     @context.scale(1/@scaler, 1/@scaler)
     @context.clearRect(0,0,@canvas.width,@canvas.height)
+
+    #reset variables for next iteration...
+    @string = this.startingString
+
+    @max = {x:0, y:0}
+    @min = {x:0, y:0}
+
+    @lastTrans = {x:0, y: 0}
+    @scaler = 1
+
+    @pos = { x: 0, y: 0 } #turtles initial position
+    @points = [$.extend( true, {}, @pos )]
 
   resizeCanvas: ->
     width = @max.x - @min.x
@@ -152,6 +177,14 @@ class Turtle
     @lastTrans.x = dx
     @lastTrans.y = dy
     @context.translate(dx, dy)
+  drawNextIteration: ->
+    this.resetCanvas()
+
+    this.iterations++
+    customTimer(this.generateString, 'generate string', this)
+    customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
+    this.resizeCanvas()  #resize the canvas to fit shape
+    customTimer(this.draw, 'drawAnimate', this)
 
 #-- Custom Functions
 customTimeInterval = (ms, func) -> setInterval func, ms
@@ -165,6 +198,29 @@ customTimer = (func, desc, context) ->
   t2 = Date.now()
   console.log desc + ": " + ( t2-t1 )/ 1000 + ' sec'
 
-# sierpinski triangle -- options = { angle: Math.PI/3, startingString: 'A', rules:[{input:'A', output:'BlAlB'},{input:'B', output:'ArBrA'}] }
-# dragon -- options = { angle: Math.PI/2, startingString: 'FX', rules:[{input:'X', output:'XlYFl'},{input:'Y', output:'rFXrY'}] }
-
+sierpinksiTriangle =
+  rules:[
+    {input:'A', output:'BlAlB'}
+    {input:'B', output:'ArBrA'}
+  ]
+  iterations: 2
+  angle: Math.PI/3
+  startingString: 'A'
+dragon =
+  rules: [
+    {input:'X', output:'XlYFl'}
+    {input:'Y', output:'rFXrY'}
+  ]
+  iterations: 2
+  angle: Math.PI/2
+  distanceMultiplier: 1.0005
+  startingString:  "FX"
+options =
+  rules: [
+    {input:'X', output:'XlYFl'}
+    {input:'Y', output:'rFXrY'}
+  ]
+  iterations: 2
+  angle: Math.PI/2
+  #distanceMultiplier: 1.0005
+  startingString:  "FX"
