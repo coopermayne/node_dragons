@@ -221,7 +221,7 @@ module.exports = HomeView = (function(_super) {
 
 $(document).ready(function() {
   var options, t;
-  options = dragon;
+  options = sierpinksiTriangle;
   t = new Turtle(options);
   $(window).on('keypress', function(e) {
     if (e.charCode === 110) {
@@ -233,7 +233,7 @@ $(document).ready(function() {
   });
   return customTimeInterval(1000, function() {
     var maxIterations;
-    maxIterations = 8;
+    maxIterations = 5;
     if (t.iterations < maxIterations) {
       return t.drawNextIteration();
     }
@@ -370,24 +370,41 @@ Turtle = (function() {
   };
 
   Turtle.prototype.draw = function() {
-    var ctx, newX, newY, point, _i, _len, _ref;
+    var changeColor, ctx, i, newX, newY, point, _i, _len, _ref;
     ctx = this.context;
-    ctx.lineWidth = 5 / this.scaler;
-    ctx.strokeStyle = 'purple';
+    ctx.lineWidth = 1 / this.scaler;
     ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'yellow';
     ctx.beginPath();
     ctx.moveTo(this.points[0].x, this.points[0].y);
+    changeColor = function(color, ctx) {
+      ctx.lineTo(newX, newY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(newX, newY);
+      return ctx.strokeStyle = color;
+    };
     _ref = this.points;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      point = _ref[_i];
+    for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+      point = _ref[i];
       newX = point.x;
       newY = point.y;
-      ctx.lineTo(newX, newY);
+      if (i === 0 * Math.round(this.points.length / 3)) {
+        changeColor('blue', ctx);
+      }
+      if (i === 1 * Math.round(this.points.length / 3)) {
+        changeColor('green', ctx);
+      } else if (i === 2 * Math.round(this.points.length / 3)) {
+        changeColor('red', ctx);
+      } else {
+        ctx.lineTo(newX, newY);
+      }
     }
     return ctx.stroke();
   };
 
   Turtle.prototype.resetCanvas = function() {
+    console.log(this.distance);
     this.context.translate(-this.lastTrans.x, -this.lastTrans.y);
     this.context.scale(1 / this.scaler, 1 / this.scaler);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -440,10 +457,11 @@ Turtle = (function() {
   Turtle.prototype.drawNextIteration = function() {
     this.resetCanvas();
     this.iterations++;
+    this.radians = this.radians + Math.PI;
     customTimer(this.generateString, 'generate string', this);
     customTimer(this.findPoints, 'find points', this);
     this.resizeCanvas();
-    return customTimer(this.draw, 'drawAnimate', this);
+    return customTimer(this.draw, 'draw', this);
   };
 
   return Turtle;
@@ -493,7 +511,6 @@ dragon = {
   ],
   iterations: 2,
   angle: Math.PI / 2,
-  distanceMultiplier: 1.0005,
   startingString: "FX"
 };
 

@@ -7,7 +7,7 @@ module.exports = class HomeView extends View
 
 $(document).ready ->
   #TODO connect with form
-  options = dragon
+  options = sierpinksiTriangle
   t = new Turtle(options)
 
   $(window).on 'keypress', (e)->
@@ -23,7 +23,7 @@ $(document).ready ->
     #t = new Turtle(options)
 
   customTimeInterval 1000, ->
-    maxIterations = 8
+    maxIterations = 5
     if t.iterations < maxIterations
       t.drawNextIteration()
 
@@ -116,34 +116,52 @@ class Turtle
 
   draw: ->
     ctx = @context
-    ctx.lineWidth = 5/@scaler
-    ctx.strokeStyle= 'purple'
+    ctx.lineWidth = 1/@scaler
     ctx.lineJoin = 'round'
+    ctx.strokeStyle = 'yellow'
     ctx.beginPath()
     ctx.moveTo(@points[0].x, @points[0].y)
-    for point in @points
+
+    changeColor = (color, ctx)->
+      ctx.lineTo(newX,newY)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(newX,newY)
+      ctx.strokeStyle = color
+
+    for point,i in @points
       newX = point.x
       newY = point.y
-      ctx.lineTo(newX,newY)
-    ctx.stroke()
 
+      if i == 0*Math.round @points.length/3
+        changeColor('blue', ctx)
+      if i == 1*Math.round @points.length/3
+        changeColor('green', ctx)
+      else if i == 2*Math.round @points.length/3
+        changeColor('red', ctx)
+      #else if i == 3*Math.round @points.length/5
+        #changeColor('white', ctx)
+      #else if i == 4*Math.round @points.length/5
+        #changeColor('grey', ctx)
+      else
+        ctx.lineTo(newX,newY)
+
+    ctx.stroke()
   resetCanvas: ->
     # undo the transformations that you made when
     # plotting... this way everything is ready
     # for next iteration
+    console.log @distance
     @context.translate(-@lastTrans.x,-@lastTrans.y)
     @context.scale(1/@scaler, 1/@scaler)
     @context.clearRect(0,0,@canvas.width,@canvas.height)
 
     #reset variables for next iteration...
     @string = this.startingString
-
     @max = {x:0, y:0}
     @min = {x:0, y:0}
-
     @lastTrans = {x:0, y: 0}
     @scaler = 1
-
     @pos = { x: 0, y: 0 } #turtles initial position
     @points = [$.extend( true, {}, @pos )]
 
@@ -153,7 +171,6 @@ class Turtle
     center =
       x: @min.x + width/2
       y: @min.y + height/2
-
     widthRatio = @canvas.width/width
     heightRatio = @canvas.height/height
 
@@ -180,11 +197,12 @@ class Turtle
   drawNextIteration: ->
     this.resetCanvas()
 
-    this.iterations++
+    @iterations++
+    @radians = @radians + Math.PI
     customTimer(this.generateString, 'generate string', this)
     customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
-    customTimer(this.draw, 'drawAnimate', this)
+    customTimer(this.draw, 'draw', this)
 
 #-- Custom Functions
 customTimeInterval = (ms, func) -> setInterval func, ms
@@ -213,7 +231,7 @@ dragon =
   ]
   iterations: 2
   angle: Math.PI/2
-  distanceMultiplier: 1.0005
+  #distanceMultiplier: 1.0005
   startingString:  "FX"
 options =
   rules: [
