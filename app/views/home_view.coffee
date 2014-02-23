@@ -252,10 +252,10 @@ dragon =
   #distanceMultiplier: 1.0005
   startingString:  "FX"
 options =
-  startingString: 'F'
+  startingString: 'FX'
   rules:[
-    {input:'F', output:'Fr[F]lF'}
-    #{input:'Y', output:'FFFF'}
+    {input:'X', output:'Xr[FXlFY]lFX'}
+    {input:'Y', output:'X[[FY]rFX]'}
   ]
   iterations: 2
-  angle: Math.PI/1.5
+  angle: Math.PI/6
