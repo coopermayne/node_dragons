@@ -52,7 +52,10 @@ class Turtle
 
     #now we actually draw the thing
     customTimer(this.generateString, 'generate string', this)
-    customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
+    console.log 'STRING: ' + @string
+    customTimer(this.readString, 'find points', this) #gets an array of points that make up the shape
+    console.log 'POINTS: ' + @points.length
+    console.log @points
     this.resizeCanvas()  #resize the canvas to fit shape
     customTimer(this.draw, 'drawAnimate', this)
   generateString: ->
@@ -71,23 +74,25 @@ class Turtle
           @string = @string.concat letter
 
   goForward: ->
-    @distance = @distance * @distanceMultiplier
-    newX = @distance * Math.cos(@radians) + @pos.x
-    newY = @distance * Math.sin(@radians) + @pos.y
+    @pos.x += @distance * Math.cos(@radians)
+    @pos.y += @distance * Math.sin(@radians)
 
-    @points.push({x: newX, y: newY})
+    @points.push {
+      x: @pos.x
+      y: @pos.y
+    }
 
-    @max.x = newX if newX > @max.x
-    @max.y = newY if newY > @max.y
-    @min.x = newX if newX < @min.x
-    @min.y = newY if newY < @min.y
-    @pos.x = newX
-    @pos.y = newY
+    @max.x = @pos.x if @pos.x > @max.x
+    @max.y = @pos.y if @pos.y > @max.y
+    @min.x = @pos.x if @pos.x < @min.x
+    @min.y = @pos.y if @pos.y < @min.y
+
   turn: (direction) ->
     if direction == 'r'
       @radians = @radians - @d_radians
     else if direction == 'l'
       @radians = @radians + @d_radians
+
   popIn: ->
     # save current angle and position to popList
     @popList.push {
@@ -104,9 +109,13 @@ class Turtle
     r = @popList.pop()
     @pos = r.pos
     @radians = r.radians
-    console.log 'node'
+    @points.push {
+      x: r.pos.x
+      y: r.pos.y
+      node: true
+    }
 
-  findPoints: ->
+  readString: ->
     for letter in @string
       if letter == 'F'
         this.goForward()
@@ -128,21 +137,22 @@ class Turtle
     changeColor = (color, ctx)->
       ctx.stroke()
       ctx.beginPath()
-      ctx.moveTo(newPoint.x,newPoint.y)
+      ctx.moveTo(point.x,point.y)
       ctx.strokeStyle = color
 
     for point,i in @points
-      newPoint = point
-      ctx.lineTo(newPoint.x,newPoint.y)
+
       if point.node
-        console.log 'node'
+        ctx.moveTo(point.x, point.y)
+      else
+        ctx.lineTo(point.x,point.y)
+
       if i == 0*Math.round @points.length/3
         changeColor('white', ctx)
       if i == 1*Math.round @points.length/3
         changeColor('white', ctx)
       else if i == 2*Math.round @points.length/3
         changeColor('white', ctx)
-      else
 
     ctx.stroke()
   resetCanvas: ->
@@ -197,7 +207,7 @@ class Turtle
     @iterations++
     @radians = @radians
     customTimer(this.generateString, 'generate string', this)
-    customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
+    customTimer(this.readString, 'find points', this) #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
     customTimer(this.draw, 'draw', this)
 
@@ -236,5 +246,5 @@ plant =
     {input:'X', output:'Fr[[X]lX]lF[lFX]rX'}
     {input:'F', output:'FF'}
   ]
-  iterations: 2
-  angle: Math.PI/6
+  iterations: 1
+  angle: Math.PI/7

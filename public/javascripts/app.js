@@ -266,7 +266,10 @@ Turtle = (function() {
     };
     this.points = [$.extend(true, {}, this.pos)];
     customTimer(this.generateString, 'generate string', this);
-    customTimer(this.findPoints, 'find points', this);
+    console.log('STRING: ' + this.string);
+    customTimer(this.readString, 'find points', this);
+    console.log('POINTS: ' + this.points.length);
+    console.log(this.points);
     this.resizeCanvas();
     customTimer(this.draw, 'drawAnimate', this);
   }
@@ -312,28 +315,24 @@ Turtle = (function() {
   };
 
   Turtle.prototype.goForward = function() {
-    var newX, newY;
-    this.distance = this.distance * this.distanceMultiplier;
-    newX = this.distance * Math.cos(this.radians) + this.pos.x;
-    newY = this.distance * Math.sin(this.radians) + this.pos.y;
+    this.pos.x += this.distance * Math.cos(this.radians);
+    this.pos.y += this.distance * Math.sin(this.radians);
     this.points.push({
-      x: newX,
-      y: newY
+      x: this.pos.x,
+      y: this.pos.y
     });
-    if (newX > this.max.x) {
-      this.max.x = newX;
+    if (this.pos.x > this.max.x) {
+      this.max.x = this.pos.x;
     }
-    if (newY > this.max.y) {
-      this.max.y = newY;
+    if (this.pos.y > this.max.y) {
+      this.max.y = this.pos.y;
     }
-    if (newX < this.min.x) {
-      this.min.x = newX;
+    if (this.pos.x < this.min.x) {
+      this.min.x = this.pos.x;
     }
-    if (newY < this.min.y) {
-      this.min.y = newY;
+    if (this.pos.y < this.min.y) {
+      return this.min.y = this.pos.y;
     }
-    this.pos.x = newX;
-    return this.pos.y = newY;
   };
 
   Turtle.prototype.turn = function(direction) {
@@ -360,10 +359,14 @@ Turtle = (function() {
     r = this.popList.pop();
     this.pos = r.pos;
     this.radians = r.radians;
-    return console.log('node');
+    return this.points.push({
+      x: r.pos.x,
+      y: r.pos.y,
+      node: true
+    });
   };
 
-  Turtle.prototype.findPoints = function() {
+  Turtle.prototype.readString = function() {
     var letter, _i, _len, _ref, _results;
     _ref = this.string;
     _results = [];
@@ -387,7 +390,7 @@ Turtle = (function() {
   };
 
   Turtle.prototype.draw = function() {
-    var changeColor, ctx, i, newPoint, point, _i, _len, _ref;
+    var changeColor, ctx, i, point, _i, _len, _ref;
     ctx = this.context;
     ctx.lineWidth = 0.3 / this.scaler;
     ctx.lineJoin = 'round';
@@ -395,16 +398,16 @@ Turtle = (function() {
     changeColor = function(color, ctx) {
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(newPoint.x, newPoint.y);
+      ctx.moveTo(point.x, point.y);
       return ctx.strokeStyle = color;
     };
     _ref = this.points;
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       point = _ref[i];
-      newPoint = point;
-      ctx.lineTo(newPoint.x, newPoint.y);
       if (point.node) {
-        console.log('node');
+        ctx.moveTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
       }
       if (i === 0 * Math.round(this.points.length / 3)) {
         changeColor('white', ctx);
@@ -413,8 +416,6 @@ Turtle = (function() {
         changeColor('white', ctx);
       } else if (i === 2 * Math.round(this.points.length / 3)) {
         changeColor('white', ctx);
-      } else {
-
       }
     }
     return ctx.stroke();
@@ -475,7 +476,7 @@ Turtle = (function() {
     this.iterations++;
     this.radians = this.radians;
     customTimer(this.generateString, 'generate string', this);
-    customTimer(this.findPoints, 'find points', this);
+    customTimer(this.readString, 'find points', this);
     this.resizeCanvas();
     return customTimer(this.draw, 'draw', this);
   };
@@ -541,8 +542,8 @@ plant = {
       output: 'FF'
     }
   ],
-  iterations: 2,
-  angle: Math.PI / 6
+  iterations: 1,
+  angle: Math.PI / 7
 };
 
 });

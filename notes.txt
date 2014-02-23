@@ -1,0 +1,9 @@
+F - lineTo next point with current angle and distance...
+r - change current angle by d_radians
+l - change current angle by opposite of d_radians
+[ - SAVE current angle and position in an array
+] - RESTORE angle and position by popping from array....
+      do i have to end stroke?? NO
+      -push a point into points array with node=true attribute
+      -when you are drawing the points array... and you get to
+        a point with node = true attr... moveTo that point instead of lineTo
