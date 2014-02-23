@@ -349,8 +349,7 @@ Turtle = (function() {
       pos: {
         x: this.pos.x,
         y: this.pos.y
-      },
-      node: true
+      }
     });
   };
 
@@ -360,9 +359,9 @@ Turtle = (function() {
     this.pos = r.pos;
     this.radians = r.radians;
     return this.points.push({
-      x: r.pos.x,
-      y: r.pos.y,
-      node: true
+      x: this.pos.x,
+      y: this.pos.y,
+      isNode: true
     });
   };
 
@@ -372,18 +371,24 @@ Turtle = (function() {
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       letter = _ref[_i];
-      if (letter === 'F') {
-        _results.push(this.goForward());
-      } else if (letter === "[") {
-        _results.push(this.popIn());
-      } else if (letter === "]") {
-        _results.push(this.popOut());
-      } else if (letter === 'l') {
-        _results.push(this.turn('l'));
-      } else if (letter === 'r') {
-        _results.push(this.turn('r'));
-      } else {
-        _results.push(void 0);
+      switch (letter) {
+        case 'F':
+          _results.push(this.goForward());
+          break;
+        case "[":
+          _results.push(this.popIn());
+          break;
+        case "]":
+          _results.push(this.popOut());
+          break;
+        case 'l':
+          _results.push(this.turn('l'));
+          break;
+        case 'r':
+          _results.push(this.turn('r'));
+          break;
+        default:
+          _results.push(void 0);
       }
     }
     return _results;
@@ -404,7 +409,7 @@ Turtle = (function() {
     _ref = this.points;
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       point = _ref[i];
-      if (point.node) {
+      if (point.isNode) {
         ctx.moveTo(point.x, point.y);
       } else {
         ctx.lineTo(point.x, point.y);

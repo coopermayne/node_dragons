@@ -64,6 +64,8 @@ class Turtle
     while num -= 1
       ruleInputs = @rules.map (x) -> x.input
       old = @string
+      # making a new string each time might be a bit slow
+      # refactor to alter the same string object.... TODO
       @string = new String
       for letter in old
         if letter in ruleInputs
@@ -101,7 +103,6 @@ class Turtle
         x: @pos.x
         y: @pos.y
       }
-      node:true
     }
 
   popOut: ->
@@ -110,23 +111,19 @@ class Turtle
     @pos = r.pos
     @radians = r.radians
     @points.push {
-      x: r.pos.x
-      y: r.pos.y
-      node: true
+      x: @pos.x
+      y: @pos.y
+      isNode: true
     }
 
   readString: ->
     for letter in @string
-      if letter == 'F'
-        this.goForward()
-      else if letter == "["
-        this.popIn()
-      else if letter == "]"
-        this.popOut()
-      else if letter == 'l'
-        this.turn 'l'
-      else if letter == 'r'
-        this.turn 'r'
+      switch letter
+        when 'F' then this.goForward()
+        when "[" then this.popIn()
+        when "]" then this.popOut()
+        when 'l' then this.turn 'l'
+        when 'r' then this.turn 'r'
 
   draw: ->
     ctx = @context
@@ -142,7 +139,7 @@ class Turtle
 
     for point,i in @points
 
-      if point.node
+      if point.isNode
         ctx.moveTo(point.x, point.y)
       else
         ctx.lineTo(point.x,point.y)
