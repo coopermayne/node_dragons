@@ -7,7 +7,6 @@ module.exports = class HomeView extends View
 
 $(document).ready ->
   #TODO connect with form
-  options = sierpinksiTriangle
   t = new Turtle(options)
 
   $(window).on 'keypress', (e)->
@@ -22,10 +21,10 @@ $(document).ready ->
     #options.iterations++
     #t = new Turtle(options)
 
-  customTimeInterval 1000, ->
-    maxIterations = 5
-    if t.iterations < maxIterations
-      t.drawNextIteration()
+  #customTimeInterval 1000, ->
+    #maxIterations = 5
+    #if t.iterations < maxIterations
+      #t.drawNextIteration()
 
 class Turtle
   constructor: (options) ->
@@ -39,6 +38,7 @@ class Turtle
     @context = @canvas.getContext('2d')
     @radians = 0 #starting angle of t.... (east)
     @string = options.startingString
+    @popList = []
 
     @max = {x:0, y:0}
     @min = {x:0, y:0}
@@ -68,6 +68,8 @@ class Turtle
               @string = @string.concat rule.output
         else
           @string = @string.concat letter
+    console.log @string
+
   goForward: ->
     @distance = @distance * @distanceMultiplier
     newX = @distance * Math.cos(@radians) + @pos.x
@@ -86,15 +88,35 @@ class Turtle
       @radians = @radians - @d_radians
     else if direction == 'l'
       @radians = @radians + @d_radians
+  popIn: ->
+    # save current angle and position to popList
+    @popList.push {
+      radians: @radians
+      pos: {
+        x: @pos.x
+        y: @pos.y
+      }
+    }
+
+  popOut: ->
+    # restore angle and position from popList
+    r = @popList.pop()
+    @pos = r.pos
+    @radians = r.radians
+
   findPoints: ->
 
     for letter in @string
-      if /[ABF]/.test letter
-        @goForward()
+      if letter == 'F'
+        this.goForward()
+      else if letter == "["
+        this.popIn()
+      else if letter == "]"
+        this.popOut()
       else if letter == 'l'
-        @turn 'l'
+        this.turn 'l'
       else if letter == 'r'
-        @turn 'r'
+        this.turn 'r'
 
   #drawAnimate: ->
     #ctx = @context
@@ -134,15 +156,11 @@ class Turtle
       newY = point.y
 
       if i == 0*Math.round @points.length/3
-        changeColor('blue', ctx)
+        changeColor('white', ctx)
       if i == 1*Math.round @points.length/3
-        changeColor('green', ctx)
+        changeColor('white', ctx)
       else if i == 2*Math.round @points.length/3
-        changeColor('red', ctx)
-      #else if i == 3*Math.round @points.length/5
-        #changeColor('white', ctx)
-      #else if i == 4*Math.round @points.length/5
-        #changeColor('grey', ctx)
+        changeColor('white', ctx)
       else
         ctx.lineTo(newX,newY)
 
@@ -198,7 +216,7 @@ class Turtle
     this.resetCanvas()
 
     @iterations++
-    @radians = @radians + Math.PI
+    @radians = @radians
     customTimer(this.generateString, 'generate string', this)
     customTimer(this.findPoints, 'find points', this) #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
@@ -218,12 +236,12 @@ customTimer = (func, desc, context) ->
 
 sierpinksiTriangle =
   rules:[
-    {input:'A', output:'BlAlB'}
-    {input:'B', output:'ArBrA'}
+    {input:'A', output:'BlFAlFB'}
+    {input:'B', output:'ArFBrFA'}
   ]
   iterations: 2
   angle: Math.PI/3
-  startingString: 'A'
+  startingString: 'FA'
 dragon =
   rules: [
     {input:'X', output:'XlYFl'}
@@ -234,11 +252,10 @@ dragon =
   #distanceMultiplier: 1.0005
   startingString:  "FX"
 options =
-  rules: [
-    {input:'X', output:'XlYFl'}
-    {input:'Y', output:'rFXrY'}
+  startingString: 'F'
+  rules:[
+    {input:'F', output:'Fr[F]lF'}
+    #{input:'Y', output:'FFFF'}
   ]
   iterations: 2
-  angle: Math.PI/2
-  #distanceMultiplier: 1.0005
-  startingString:  "FX"
+  angle: Math.PI/1.5
