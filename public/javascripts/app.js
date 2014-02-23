@@ -194,7 +194,7 @@ module.exports = Model = (function(_super) {
 });
 
 ;require.register("views/home_view", function(exports, require, module) {
-var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, options, sierpinksiTriangle, template,
+var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, plant, sierpinksiTriangle, template,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -220,7 +220,8 @@ module.exports = HomeView = (function(_super) {
 })(View);
 
 $(document).ready(function() {
-  var t;
+  var options, t;
+  options = plant;
   t = new Turtle(options);
   $(window).on('keypress', function(e) {
     if (e.charCode === 110) {
@@ -271,30 +272,43 @@ Turtle = (function() {
   }
 
   Turtle.prototype.generateString = function() {
-    var letter, num, old, rule, ruleInputs, _i, _j, _len, _len1, _ref;
+    var letter, num, old, rule, ruleInputs, _results;
     num = this.iterations;
+    _results = [];
     while (num -= 1) {
       ruleInputs = this.rules.map(function(x) {
         return x.input;
       });
       old = this.string;
       this.string = new String;
-      for (_i = 0, _len = old.length; _i < _len; _i++) {
-        letter = old[_i];
-        if (__indexOf.call(ruleInputs, letter) >= 0) {
-          _ref = this.rules;
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            rule = _ref[_j];
-            if (letter === rule.input) {
-              this.string = this.string.concat(rule.output);
-            }
+      _results.push((function() {
+        var _i, _len, _results1;
+        _results1 = [];
+        for (_i = 0, _len = old.length; _i < _len; _i++) {
+          letter = old[_i];
+          if (__indexOf.call(ruleInputs, letter) >= 0) {
+            _results1.push((function() {
+              var _j, _len1, _ref, _results2;
+              _ref = this.rules;
+              _results2 = [];
+              for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                rule = _ref[_j];
+                if (letter === rule.input) {
+                  _results2.push(this.string = this.string.concat(rule.output));
+                } else {
+                  _results2.push(void 0);
+                }
+              }
+              return _results2;
+            }).call(this));
+          } else {
+            _results1.push(this.string = this.string.concat(letter));
           }
-        } else {
-          this.string = this.string.concat(letter);
         }
-      }
+        return _results1;
+      }).call(this));
     }
-    return console.log(this.string);
+    return _results;
   };
 
   Turtle.prototype.goForward = function() {
@@ -336,7 +350,8 @@ Turtle = (function() {
       pos: {
         x: this.pos.x,
         y: this.pos.y
-      }
+      },
+      node: true
     });
   };
 
@@ -344,7 +359,8 @@ Turtle = (function() {
     var r;
     r = this.popList.pop();
     this.pos = r.pos;
-    return this.radians = r.radians;
+    this.radians = r.radians;
+    return console.log('node');
   };
 
   Turtle.prototype.findPoints = function() {
@@ -371,25 +387,25 @@ Turtle = (function() {
   };
 
   Turtle.prototype.draw = function() {
-    var changeColor, ctx, i, newX, newY, point, _i, _len, _ref;
+    var changeColor, ctx, i, newPoint, point, _i, _len, _ref;
     ctx = this.context;
-    ctx.lineWidth = 1 / this.scaler;
+    ctx.lineWidth = 0.3 / this.scaler;
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = 'yellow';
     ctx.beginPath();
-    ctx.moveTo(this.points[0].x, this.points[0].y);
     changeColor = function(color, ctx) {
-      ctx.lineTo(newX, newY);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(newX, newY);
+      ctx.moveTo(newPoint.x, newPoint.y);
       return ctx.strokeStyle = color;
     };
     _ref = this.points;
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       point = _ref[i];
-      newX = point.x;
-      newY = point.y;
+      newPoint = point;
+      ctx.lineTo(newPoint.x, newPoint.y);
+      if (point.node) {
+        console.log('node');
+      }
       if (i === 0 * Math.round(this.points.length / 3)) {
         changeColor('white', ctx);
       }
@@ -398,14 +414,13 @@ Turtle = (function() {
       } else if (i === 2 * Math.round(this.points.length / 3)) {
         changeColor('white', ctx);
       } else {
-        ctx.lineTo(newX, newY);
+
       }
     }
     return ctx.stroke();
   };
 
   Turtle.prototype.resetCanvas = function() {
-    console.log(this.distance);
     this.context.translate(-this.lastTrans.x, -this.lastTrans.y);
     this.context.scale(1 / this.scaler, 1 / this.scaler);
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -486,6 +501,7 @@ customTimer = function(func, desc, context) {
 };
 
 sierpinksiTriangle = {
+  startingString: 'FA',
   rules: [
     {
       input: 'A',
@@ -496,11 +512,11 @@ sierpinksiTriangle = {
     }
   ],
   iterations: 2,
-  angle: Math.PI / 3,
-  startingString: 'FA'
+  angle: Math.PI / 3
 };
 
 dragon = {
+  startingString: "FX",
   rules: [
     {
       input: 'X',
@@ -511,19 +527,18 @@ dragon = {
     }
   ],
   iterations: 2,
-  angle: Math.PI / 2,
-  startingString: "FX"
+  angle: Math.PI / 2
 };
 
-options = {
+plant = {
   startingString: 'FX',
   rules: [
     {
       input: 'X',
-      output: 'Xr[FXlFY]lFX'
+      output: 'Fr[[X]lX]lF[lFX]rX'
     }, {
-      input: 'Y',
-      output: 'X[[FY]rFX]'
+      input: 'F',
+      output: 'FF'
     }
   ],
   iterations: 2,

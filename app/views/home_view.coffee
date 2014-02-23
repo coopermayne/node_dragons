@@ -7,6 +7,7 @@ module.exports = class HomeView extends View
 
 $(document).ready ->
   #TODO connect with form
+  options = plant
   t = new Turtle(options)
 
   $(window).on 'keypress', (e)->
@@ -68,7 +69,6 @@ class Turtle
               @string = @string.concat rule.output
         else
           @string = @string.concat letter
-    console.log @string
 
   goForward: ->
     @distance = @distance * @distanceMultiplier
@@ -96,6 +96,7 @@ class Turtle
         x: @pos.x
         y: @pos.y
       }
+      node:true
     }
 
   popOut: ->
@@ -103,9 +104,9 @@ class Turtle
     r = @popList.pop()
     @pos = r.pos
     @radians = r.radians
+    console.log 'node'
 
   findPoints: ->
-
     for letter in @string
       if letter == 'F'
         this.goForward()
@@ -118,43 +119,23 @@ class Turtle
       else if letter == 'r'
         this.turn 'r'
 
-  #drawAnimate: ->
-    #ctx = @context
-    #ctx.lineWidth = 1/@scaler
-    #ctx.strokeStyle= 'purple'
-    #ctx.lineJoin = 'round'
-    #ctx.beginPath()
-    #ctx.moveTo(@points[0].x, @points[0].y)
-    #i = 0
-    #p = @points
-    #setInterval ->
-      ##draw each segment
-      #i++
-      #newX = p[i].x
-      #newY = p[i].y
-      #ctx.lineTo(newX,newY)
-      #ctx.stroke()
-    #,1000
-
   draw: ->
     ctx = @context
-    ctx.lineWidth = 1/@scaler
+    ctx.lineWidth = 0.3/@scaler
     ctx.lineJoin = 'round'
-    ctx.strokeStyle = 'yellow'
     ctx.beginPath()
-    ctx.moveTo(@points[0].x, @points[0].y)
 
     changeColor = (color, ctx)->
-      ctx.lineTo(newX,newY)
       ctx.stroke()
       ctx.beginPath()
-      ctx.moveTo(newX,newY)
+      ctx.moveTo(newPoint.x,newPoint.y)
       ctx.strokeStyle = color
 
     for point,i in @points
-      newX = point.x
-      newY = point.y
-
+      newPoint = point
+      ctx.lineTo(newPoint.x,newPoint.y)
+      if point.node
+        console.log 'node'
       if i == 0*Math.round @points.length/3
         changeColor('white', ctx)
       if i == 1*Math.round @points.length/3
@@ -162,14 +143,12 @@ class Turtle
       else if i == 2*Math.round @points.length/3
         changeColor('white', ctx)
       else
-        ctx.lineTo(newX,newY)
 
     ctx.stroke()
   resetCanvas: ->
     # undo the transformations that you made when
     # plotting... this way everything is ready
     # for next iteration
-    console.log @distance
     @context.translate(-@lastTrans.x,-@lastTrans.y)
     @context.scale(1/@scaler, 1/@scaler)
     @context.clearRect(0,0,@canvas.width,@canvas.height)
@@ -235,14 +214,15 @@ customTimer = (func, desc, context) ->
   console.log desc + ": " + ( t2-t1 )/ 1000 + ' sec'
 
 sierpinksiTriangle =
+  startingString: 'FA'
   rules:[
     {input:'A', output:'BlFAlFB'}
     {input:'B', output:'ArFBrFA'}
   ]
   iterations: 2
   angle: Math.PI/3
-  startingString: 'FA'
 dragon =
+  startingString:  "FX"
   rules: [
     {input:'X', output:'XlYFl'}
     {input:'Y', output:'rFXrY'}
@@ -250,12 +230,11 @@ dragon =
   iterations: 2
   angle: Math.PI/2
   #distanceMultiplier: 1.0005
-  startingString:  "FX"
-options =
+plant =
   startingString: 'FX'
   rules:[
-    {input:'X', output:'Xr[FXlFY]lFX'}
-    {input:'Y', output:'X[[FY]rFX]'}
+    {input:'X', output:'Fr[[X]lX]lF[lFX]rX'}
+    {input:'F', output:'FF'}
   ]
   iterations: 2
   angle: Math.PI/6
