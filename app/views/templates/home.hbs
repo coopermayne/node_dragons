@@ -1,20 +1,23 @@
 <div id="content">
 
   <div id='controlPanel'>
-    <h3>Control Panel</h3>
-    <label>fun settings:</label>
-    <select name="preDefined" id="preDefined">
-      <option value="sierpinksiTriangle">sierpinksi triangle</option>
-      <option value="dragon">dragon</option>
-      <option value="plant">plant</option>
-      <option value="kochCurve">koch curve</option>
-    </select>
     <form id='params'>
+    <h3>Parameters</h3>
 
       <table border="0">
 
         <tr>
-          <td> <label>Angle</label> </td>
+          <td><label>Favorite Settings:</label></td>
+          <td><select name="preDefined" id="preDefined">
+            <option value="sierpinksiTriangle">sierpinksi triangle</option>
+            <option value="dragon">dragon</option>
+            <option value="plant">plant</option>
+            <option value="kochCurve">koch curve</option>
+        </select></td>
+        </tr>
+
+        <tr>
+          <td> <label>Angle:</label> </td>
           <td>
             <input type="text" name="angle" value="&pi;/6" id="angle">
             <select>
@@ -26,7 +29,7 @@
         </tr>
 
         <tr>
-          <td> <label>Iterations</label> </td>
+          <td> <label>Iterations:</label> </td>
           <td>
             <input type="text" name="iterations" value="5" id="iterations">
             <span><button>+</button><button>-</button></span>
@@ -34,14 +37,14 @@
         </tr>
         
         <tr>
-          <td> <label>Initial string</label> </td>
+          <td> <label>Initial string:</label> </td>
           <td>
             <input type="text" name="startingString" value="FX" id="startingString">
           </td>
         </tr>
 
         <tr>
-          <td> <label>Rule 1</label> </td>
+          <td> <label>Rule 1:</label> </td>
           <td>
             <input class='input' type="text" name="r1_input" value="X" id="r1_input">
             &rarr;
@@ -50,7 +53,7 @@
         </tr>
         
         <tr>
-          <td> <label>Rule 2</label> </td>
+          <td> <label>Rule 2:</label> </td>
           <td>
             <input class='input' type="text" name="r2_input" value="F" id="r2_input">
             &rarr;
@@ -59,7 +62,7 @@
         </tr>
         
         <tr>
-          <td> <label>Rule 3</label> </td>
+          <td> <label>Rule 3:</label> </td>
           <td>
             <input class='input' type="text" name="r3_input" value="" id="r3_input">
             &rarr;
@@ -70,14 +73,13 @@
 
       </table>
       <input type="submit" value="Generate Graphic">
-      <a id='hide'>hide</a>
     </form>
+
   </div>
 
   <div id='info'>
     <span>generating...</span>
-    <!--<a id='show'>controls</a>-->
-    <span class="iconicstroke-equalizer"></span>
+    <span id='toggleControls' class="icon-settings"></span>
   </div>
 
   <canvas id="canvas" width="700" height="700"></canvas>

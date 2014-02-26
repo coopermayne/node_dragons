@@ -1,57 +1,122 @@
 // No more vendor prefixes. http://visionmedia.github.com/nib/
 
 @import 'nib'
-@import 'http://weloveiconfonts.com/api/?family=iconicstroke'
 
 body
-  background: grey
+  background grey
 
 canvas
-  background: black
-  //width: 400px
-  //height: 400px
+  background black
 
 #controlPanel
-  position: fixed
-  background: rgba(255,255,255,0.7)
-  padding: 10px
-  font-size: 16px
-  display: none
+  display:none
+  position fixed
+  background rgba(255,255,255,0.7)
+  padding 10px
+  font-size 16px
+  width 500px
+  right 0
+  left 0
+  margin 0 auto
+  box-shadow 7px 7px 5px rgba(255,255,255,0.2)
+  top 60px
+
+#controlPanel h3
+  margin 0 0 8px 0
+  text-align center
+
+form
+  width 85%
+  margin 0 auto 10px auto
+
 
 table td
-  padding: 5px
-
-input[type=submit]
-  position: relative
-  margin-right: 0
+  padding 5px
 
 input[type=text]
-  display: inline
-  width: 50px
+  display inline
+  width 50px
 input.output
-  width: 180px
+  width 180px
+
+input[type=submit]
+  margin 0 auto 0 140px
 
 #controlPanelHandle
-  text-align: right
+  text-align right
 
 #home-view
-  width: 100%
-  max-width: 700px
-  margin: 0 auto
+  width 100%
+  max-width 700px
+  margin 0 auto
 
 #info
-  font-variant: small-caps
-  font-size: 16px
-  color: white
-  background: black
-  padding: 7px
+  font-variant small-caps
+  font-size 20px
+  color white
+  background black
+  padding 15px
+  border-bottom 2px grey solid
+
 #info a
-  color: white
+  color white
 a
-  float: right
+  float right
 
+[class*="icon-"]
+  display inline-block
+  width 32px
+  height 32px
+  background-image url(../images/sprites.png)
+  background-repeat no-repeat
 
-/* iconicstroke */
-[class*="iconicstroke-"]:before
-  font-family: 'IconicStroke', sans-serif
-  color: white
+#toggleControls
+  float right
+#toggleControls:hover
+  cursor pointer
+
+.icon-settings
+  background-position 0 0
+  width 32px
+
+.icon-equalizer {
+        background-position -48px 0;
+        width 32px;
+}
+.icon-cog {
+        background-position -96px 0;
+        width 32px;
+}
+.icon-cog2 {
+        background-position -144px 0;
+        width 32px;
+}
+.icon-wrench {
+        background-position -192px 0;
+        width 32px;
+}
+.icon-pencil {
+        background-position -240px 0;
+        width 32px;
+}
+.icon-pencil2 {
+        background-position -288px 0;
+        width 32px;
+}
+.icon-star {
+        background-position -336px 0;
+        width 32px;
+}
+.icon-star2 {
+        background-position -384px 0;
+        width 32px;
+}
+.icon-star3 {
+        background-position -432px 0;
+        width 32px;
+}
+.icon-menu {
+        background-position -480px 0;
+        width 32px;
+}
+

@@ -9,11 +9,8 @@ $(document).ready ->
   #TODO connect with form
   t = new Turtle(plant)
 
-  $('a#show').on 'click', (e)->
-    $('#controlPanel').slideDown()
-    e.preventDefault()
-  $('a#hide').on 'click', (e)->
-    $('#controlPanel').slideUp()
+  $('#toggleControls').on 'click', (e)->
+    $('#controlPanel').slideToggle()
     e.preventDefault()
 
   $('canvas').on 'click', (e)->
