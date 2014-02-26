@@ -70,29 +70,47 @@ body {
 canvas {
   background: #000;
 }
-form {
+#controlPanel {
+  position: fixed;
+  background: rgba(255,255,255,0.7);
+  padding: 10px;
+  font-size: 16px;
+  display: none;
+}
+table td {
   padding: 5px;
 }
-input {
-  width: 30px;
+input[type=submit] {
+  position: relative;
+  margin-right: 0;
+}
+input[type=text] {
+  display: inline;
+  width: 50px;
 }
 input.output {
-  width: 100px;
+  width: 180px;
 }
-button {
-  font-size: 20px;
-  float: right;
+#controlPanelHandle {
+  text-align: right;
 }
 #home-view {
   width: 100%;
-  max-width: 800px;
+  max-width: 700px;
   margin: 0 auto;
 }
 #info {
-  font-size: 20px;
+  font-variant: small-caps;
+  font-size: 16px;
   color: #fff;
   background: #000;
   padding: 7px;
+}
+#info a {
+  color: #fff;
+}
+a {
+  float: right;
 }
 
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; *line-height: 0; }

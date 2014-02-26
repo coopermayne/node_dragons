@@ -7,34 +7,29 @@ module.exports = class HomeView extends View
 
 $(document).ready ->
   #TODO connect with form
-  options = plant
-  t = new Turtle(options)
+  t = new Turtle(plant)
 
-  $(window).on 'keypress', (e)->
-    if e.charCode == 110
-      t.drawNextIteration()
+  $('a#show').on 'click', (e)->
+    $('#controlPanel').slideDown()
+    e.preventDefault()
+  $('a#hide').on 'click', (e)->
+    $('#controlPanel').slideUp()
+    e.preventDefault()
+
+  $('canvas').on 'click', (e)->
+    t.drawNextIteration()
 
   $('button').on 'click', ->
     t.drawNextIteration()
 
-    #t.iterations++
-    #t.resetCanvas()
-    #options.iterations++
-    #t = new Turtle(options)
-
-  #customTimeInterval 1000, ->
-    #maxIterations = 5
-    #if t.iterations < maxIterations
-      #t.drawNextIteration()
-
 class Turtle
   constructor: (options) ->
+    @startingString = options.startingString
+    @rules = options.rules
+    @iterations = options.iterations
+    @d_radians = options.angle
     @distance = 5
     @distanceMultiplier = options.distanceMultiplier || 1
-    @d_radians = options.angle
-    @iterations = options.iterations
-    @rules = options.rules
-    @startingString = options.startingString
     @canvas = document.getElementById('canvas')
     @context = @canvas.getContext('2d')
     @radians = 0 #starting angle of t.... (east)
@@ -52,10 +47,10 @@ class Turtle
 
     #now we actually draw the thing
     customTimer(this.generateString, 'generate string', this)
-    console.log 'STRING: ' + @string
+    #console.log 'STRING: ' + @string
     customTimer(this.readString, 'find points', this) #gets an array of points that make up the shape
-    console.log 'POINTS: ' + @points.length
-    console.log @points
+    #console.log 'POINTS: ' + @points.length
+    #console.log @points
     this.resizeCanvas()  #resize the canvas to fit shape
     customTimer(this.draw, 'drawAnimate', this)
   generateString: ->
@@ -127,15 +122,10 @@ class Turtle
 
   draw: ->
     ctx = @context
-    ctx.lineWidth = 0.3/@scaler
+    ctx.lineWidth = 0.5/@scaler
     ctx.lineJoin = 'round'
+    ctx.strokeStyle = 'white'
     ctx.beginPath()
-
-    changeColor = (color, ctx)->
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(point.x,point.y)
-      ctx.strokeStyle = color
 
     for point,i in @points
 
@@ -144,14 +134,8 @@ class Turtle
       else
         ctx.lineTo(point.x,point.y)
 
-      if i == 0*Math.round @points.length/3
-        changeColor('white', ctx)
-      if i == 1*Math.round @points.length/3
-        changeColor('white', ctx)
-      else if i == 2*Math.round @points.length/3
-        changeColor('white', ctx)
-
     ctx.stroke()
+
   resetCanvas: ->
     # undo the transformations that you made when
     # plotting... this way everything is ready
@@ -185,11 +169,9 @@ class Turtle
     rulesString = rulesString.join(", ")
 
     text =
-      "#{@scaler.toFixed(2)}x,
-      iteration:  #{@iterations},
-      segments:   #{@points.length},
-      angle:      #{@d_radians.toDegrees()},
-      rules:      #{rulesString}"
+      "iterations:  #{@iterations},
+      scale:     #{@scaler.toFixed(2)},
+      segments:   #{@points.length}"
     $('#info span').text(text)
 
     dx = -1*(center.x - @canvas.width/(2*@scaler))
@@ -202,7 +184,6 @@ class Turtle
     this.resetCanvas()
 
     @iterations++
-    @radians = @radians
     customTimer(this.generateString, 'generate string', this)
     customTimer(this.readString, 'find points', this) #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
@@ -218,7 +199,7 @@ customTimer = (func, desc, context) ->
   t1 = Date.now()
   func.apply(context)
   t2 = Date.now()
-  console.log desc + ": " + ( t2-t1 )/ 1000 + ' sec'
+  #console.log desc + ": " + ( t2-t1 )/ 1000 + ' sec'
 
 sierpinksiTriangle =
   startingString: 'FA'
@@ -243,5 +224,29 @@ plant =
     {input:'X', output:'Fr[[X]lX]lF[lFX]rX'}
     {input:'F', output:'FF'}
   ]
+  iterations: 7
+  angle: Math.PI/6
+
+kochCurve =
+  startingString: 'FrrFrrF'
+  rules: [
+    {input:'F', output:'FlFrrFlF'}
+  ]
   iterations: 1
-  angle: Math.PI/7
+  angle: Math.PI/3 + 0.45
+
+
+# color option (for curiosity's sake
+#changeColor = (color, ctx)->
+  #ctx.stroke()
+  #ctx.beginPath()
+  #ctx.moveTo(point.x,point.y)
+  #ctx.strokeStyle = color
+
+#if i == 0*Math.round @points.length/3
+  #changeColor('white', ctx)
+#if i == 1*Math.round @points.length/3
+  #changeColor('white', ctx)
+#else if i == 2*Math.round @points.length/3
+  #changeColor('white', ctx)
+

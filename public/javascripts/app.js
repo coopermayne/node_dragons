@@ -194,7 +194,7 @@ module.exports = Model = (function(_super) {
 });
 
 ;require.register("views/home_view", function(exports, require, module) {
-var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, plant, sierpinksiTriangle, template,
+var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, kochCurve, plant, sierpinksiTriangle, template,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -220,13 +220,18 @@ module.exports = HomeView = (function(_super) {
 })(View);
 
 $(document).ready(function() {
-  var options, t;
-  options = plant;
-  t = new Turtle(options);
-  $(window).on('keypress', function(e) {
-    if (e.charCode === 110) {
-      return t.drawNextIteration();
-    }
+  var t;
+  t = new Turtle(plant);
+  $('a#show').on('click', function(e) {
+    $('#controlPanel').slideDown();
+    return e.preventDefault();
+  });
+  $('a#hide').on('click', function(e) {
+    $('#controlPanel').slideUp();
+    return e.preventDefault();
+  });
+  $('canvas').on('click', function(e) {
+    return t.drawNextIteration();
   });
   return $('button').on('click', function() {
     return t.drawNextIteration();
@@ -236,12 +241,12 @@ $(document).ready(function() {
 Turtle = (function() {
 
   function Turtle(options) {
+    this.startingString = options.startingString;
+    this.rules = options.rules;
+    this.iterations = options.iterations;
+    this.d_radians = options.angle;
     this.distance = 5;
     this.distanceMultiplier = options.distanceMultiplier || 1;
-    this.d_radians = options.angle;
-    this.iterations = options.iterations;
-    this.rules = options.rules;
-    this.startingString = options.startingString;
     this.canvas = document.getElementById('canvas');
     this.context = this.canvas.getContext('2d');
     this.radians = 0;
@@ -266,10 +271,7 @@ Turtle = (function() {
     };
     this.points = [$.extend(true, {}, this.pos)];
     customTimer(this.generateString, 'generate string', this);
-    console.log('STRING: ' + this.string);
     customTimer(this.readString, 'find points', this);
-    console.log('POINTS: ' + this.points.length);
-    console.log(this.points);
     this.resizeCanvas();
     customTimer(this.draw, 'drawAnimate', this);
   }
@@ -395,17 +397,12 @@ Turtle = (function() {
   };
 
   Turtle.prototype.draw = function() {
-    var changeColor, ctx, i, point, _i, _len, _ref;
+    var ctx, i, point, _i, _len, _ref;
     ctx = this.context;
-    ctx.lineWidth = 0.3 / this.scaler;
+    ctx.lineWidth = 0.5 / this.scaler;
     ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'white';
     ctx.beginPath();
-    changeColor = function(color, ctx) {
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(point.x, point.y);
-      return ctx.strokeStyle = color;
-    };
     _ref = this.points;
     for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
       point = _ref[i];
@@ -413,14 +410,6 @@ Turtle = (function() {
         ctx.moveTo(point.x, point.y);
       } else {
         ctx.lineTo(point.x, point.y);
-      }
-      if (i === 0 * Math.round(this.points.length / 3)) {
-        changeColor('white', ctx);
-      }
-      if (i === 1 * Math.round(this.points.length / 3)) {
-        changeColor('white', ctx);
-      } else if (i === 2 * Math.round(this.points.length / 3)) {
-        changeColor('white', ctx);
       }
     }
     return ctx.stroke();
@@ -466,7 +455,7 @@ Turtle = (function() {
       return "" + z.input + "->" + z.output;
     });
     rulesString = rulesString.join(", ");
-    text = "" + (this.scaler.toFixed(2)) + "x,      iteration:  " + this.iterations + ",      segments:   " + this.points.length + ",      angle:      " + (this.d_radians.toDegrees()) + ",      rules:      " + rulesString;
+    text = "iterations:  " + this.iterations + ",      scale:     " + (this.scaler.toFixed(2)) + ",      segments:   " + this.points.length;
     $('#info span').text(text);
     dx = -1 * (center.x - this.canvas.width / (2 * this.scaler));
     dy = -1 * (center.y - this.canvas.height / (2 * this.scaler));
@@ -479,7 +468,6 @@ Turtle = (function() {
   Turtle.prototype.drawNextIteration = function() {
     this.resetCanvas();
     this.iterations++;
-    this.radians = this.radians;
     customTimer(this.generateString, 'generate string', this);
     customTimer(this.readString, 'find points', this);
     this.resizeCanvas();
@@ -502,8 +490,7 @@ customTimer = function(func, desc, context) {
   var t1, t2;
   t1 = Date.now();
   func.apply(context);
-  t2 = Date.now();
-  return console.log(desc + ": " + (t2 - t1) / 1000 + ' sec');
+  return t2 = Date.now();
 };
 
 sierpinksiTriangle = {
@@ -547,8 +534,20 @@ plant = {
       output: 'FF'
     }
   ],
+  iterations: 7,
+  angle: Math.PI / 6
+};
+
+kochCurve = {
+  startingString: 'FrrFrrF',
+  rules: [
+    {
+      input: 'F',
+      output: 'FlFrrFlF'
+    }
+  ],
   iterations: 1,
-  angle: Math.PI / 7
+  angle: Math.PI / 3 + 0.45
 };
 
 });
@@ -559,7 +558,7 @@ module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partial
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n\n  <form id='params'>\n\n    <label>angle</label>\n    <input type=\"text\" name=\"angle\" value=\"90\" id=\"angle\">\n\n    <label>iterations</label>\n    <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n    \n    <label>string</label>\n    <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n\n    <label>r1</label>\n    <input type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n    \n    <label>=></label>\n    <input class='output' type=\"text\" name=\"r1_output\" value=\"X\" id=\"r1_output\">\n\n    <label>r2</label>\n    <input type=\"text\" name=\"r2_input\" value=\"X\" id=\"r2_input\">\n\n    <label>=></label>\n    <input class='output' type=\"text\" name=\"r2_output\" value=\"X\" id=\"r2_output\">\n\n    <input type=\"submit\" value=\"Go\">\n  </form>\n\n  <div id='info'><span>generating...</span>\n    <button>+</button>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
+  return "<div id=\"content\">\n\n  <div id='controlPanel'>\n    <h3>Control Panel</h3>\n    <label>fun settings:</label>\n    <select name=\"preDefined\" id=\"preDefined\">\n      <option value=\"sierpinksiTriangle\">sierpinksi triangle</option>\n      <option value=\"dragon\">dragon</option>\n      <option value=\"plant\">plant</option>\n      <option value=\"kochCurve\">koch curve</option>\n    </select>\n    <form id='params'>\n\n      <table border=\"0\">\n\n        <tr>\n          <td> <label>Angle</label> </td>\n          <td>\n            <input type=\"text\" name=\"angle\" value=\"&pi;/6\" id=\"angle\">\n            <select>\n              <option value=\"radians\">rad</option>\n              <option value=\"degrees\">deg</option>\n            </select> \n            <span><button>+</button><button>-</button></span>\n          </td>\n        </tr>\n\n        <tr>\n          <td> <label>Iterations</label> </td>\n          <td>\n            <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n            <span><button>+</button><button>-</button></span>\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Initial string</label> </td>\n          <td>\n            <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n          </td>\n        </tr>\n\n        <tr>\n          <td> <label>Rule 1</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r1_output\" value=\"Fr[[X]lX]lF[lFX]rX\" id=\"r1_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Rule 2</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r2_input\" value=\"F\" id=\"r2_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r2_output\" value=\"FF\" id=\"r2_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Rule 3</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r3_input\" value=\"\" id=\"r3_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r3_output\" value=\"\" id=\"r3_output\">\n          </td>\n        </tr>\n\n\n      </table>\n      <input type=\"submit\" value=\"Generate Graphic\">\n      <a id='hide'>hide</a>\n    </form>\n  </div>\n\n  <div id='info'>\n    <span>generating...</span>\n    <img src='images/settings.svg'>\n    <a id='show'>controls</a>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
 });
 
 ;require.register("views/view", function(exports, require, module) {

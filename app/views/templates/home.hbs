@@ -1,33 +1,83 @@
 <div id="content">
 
-  <form id='params'>
+  <div id='controlPanel'>
+    <h3>Control Panel</h3>
+    <label>fun settings:</label>
+    <select name="preDefined" id="preDefined">
+      <option value="sierpinksiTriangle">sierpinksi triangle</option>
+      <option value="dragon">dragon</option>
+      <option value="plant">plant</option>
+      <option value="kochCurve">koch curve</option>
+    </select>
+    <form id='params'>
 
-    <label>angle</label>
-    <input type="text" name="angle" value="90" id="angle">
+      <table border="0">
 
-    <label>iterations</label>
-    <input type="text" name="iterations" value="5" id="iterations">
-    
-    <label>string</label>
-    <input type="text" name="startingString" value="FX" id="startingString">
+        <tr>
+          <td> <label>Angle</label> </td>
+          <td>
+            <input type="text" name="angle" value="&pi;/6" id="angle">
+            <select>
+              <option value="radians">rad</option>
+              <option value="degrees">deg</option>
+            </select> 
+            <span><button>+</button><button>-</button></span>
+          </td>
+        </tr>
 
-    <label>r1</label>
-    <input type="text" name="r1_input" value="X" id="r1_input">
-    
-    <label>=></label>
-    <input class='output' type="text" name="r1_output" value="X" id="r1_output">
+        <tr>
+          <td> <label>Iterations</label> </td>
+          <td>
+            <input type="text" name="iterations" value="5" id="iterations">
+            <span><button>+</button><button>-</button></span>
+          </td>
+        </tr>
+        
+        <tr>
+          <td> <label>Initial string</label> </td>
+          <td>
+            <input type="text" name="startingString" value="FX" id="startingString">
+          </td>
+        </tr>
 
-    <label>r2</label>
-    <input type="text" name="r2_input" value="X" id="r2_input">
+        <tr>
+          <td> <label>Rule 1</label> </td>
+          <td>
+            <input class='input' type="text" name="r1_input" value="X" id="r1_input">
+            &rarr;
+            <input class='output' type="text" name="r1_output" value="Fr[[X]lX]lF[lFX]rX" id="r1_output">
+          </td>
+        </tr>
+        
+        <tr>
+          <td> <label>Rule 2</label> </td>
+          <td>
+            <input class='input' type="text" name="r2_input" value="F" id="r2_input">
+            &rarr;
+            <input class='output' type="text" name="r2_output" value="FF" id="r2_output">
+          </td>
+        </tr>
+        
+        <tr>
+          <td> <label>Rule 3</label> </td>
+          <td>
+            <input class='input' type="text" name="r3_input" value="" id="r3_input">
+            &rarr;
+            <input class='output' type="text" name="r3_output" value="" id="r3_output">
+          </td>
+        </tr>
 
-    <label>=></label>
-    <input class='output' type="text" name="r2_output" value="X" id="r2_output">
 
-    <input type="submit" value="Go">
-  </form>
+      </table>
+      <input type="submit" value="Generate Graphic">
+      <a id='hide'>hide</a>
+    </form>
+  </div>
 
-  <div id='info'><span>generating...</span>
-    <button>+</button>
+  <div id='info'>
+    <span>generating...</span>
+    <img src='images/settings.svg'>
+    <a id='show'>controls</a>
   </div>
 
   <canvas id="canvas" width="700" height="700"></canvas>
