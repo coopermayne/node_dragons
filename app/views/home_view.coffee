@@ -172,7 +172,7 @@ class Turtle
       "iterations:  #{@iterations},
       scale:     #{@scaler.toFixed(2)},
       segments:   #{@points.length}"
-    $('#info span').text(text)
+    $('#info span:first-child').text(text)
 
     dx = -1*(center.x - @canvas.width/(2*@scaler))
     dy = -1*(center.y- @canvas.height/(2*@scaler))
