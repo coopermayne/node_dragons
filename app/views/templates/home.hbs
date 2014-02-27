@@ -4,10 +4,10 @@
     <form id='params'>
     <h3>Parameters</h3>
 
-      <table border="0">
+      <table>
 
         <tr>
-          <td><label>Favorite Settings:</label></td>
+          <td>Favorites:</td>
           <td><select name="preDefined" id="preDefined">
             <option value="sierpinksiTriangle">sierpinksi triangle</option>
             <option value="dragon">dragon</option>
@@ -17,34 +17,40 @@
         </tr>
 
         <tr>
-          <td> <label>Angle:</label> </td>
+          <td>Angle: </td>
           <td>
             <input type="text" name="angle" value="30" id="angle">
             <select>
               <option value="degrees">deg</option>
               <option value="radians">rad</option>
             </select> 
-            <span><button>+</button><button>-</button></span>
+            <span>
+              <button id='deg-add'>+</button>
+              <button id='deg-minus'>-</button>
+            </span>
           </td>
         </tr>
 
         <tr>
-          <td> <label>Iterations:</label> </td>
+          <td>Iterations: </td>
           <td>
             <input type="text" name="iterations" value="5" id="iterations">
-            <span><button>+</button><button>-</button></span>
+            <span>
+              <button id='it-add'>+</button>
+              <button id='it-minus'>-</button>
+            </span>
           </td>
         </tr>
         
         <tr>
-          <td> <label>Initial string:</label> </td>
+          <td>Initial string: </td>
           <td>
             <input type="text" name="startingString" value="FX" id="startingString">
           </td>
         </tr>
 
         <tr>
-          <td> <label>Rule 1:</label> </td>
+          <td>Rule 1: </td>
           <td>
             <input class='input' type="text" name="r1_input" value="X" id="r1_input">
             &rarr;
@@ -53,7 +59,7 @@
         </tr>
         
         <tr>
-          <td> <label>Rule 2:</label> </td>
+          <td>Rule 2: </td>
           <td>
             <input class='input' type="text" name="r2_input" value="F" id="r2_input">
             &rarr;
@@ -62,7 +68,7 @@
         </tr>
         
         <tr>
-          <td> <label>Rule 3:</label> </td>
+          <td>Rule 3: </td>
           <td>
             <input class='input' type="text" name="r3_input" value="" id="r3_input">
             &rarr;

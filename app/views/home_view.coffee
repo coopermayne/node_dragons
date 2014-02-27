@@ -44,6 +44,23 @@ oOptionsToForm = (options) ->
   
 setUpControlPanel = ->
   #show control panel
+  $('button#deg-add').on 'click', (e) ->
+    v = $('input#angle').val()
+    $('input#angle').val(++v)
+    e.preventDefault()
+  $('button#deg-minus').on 'click', (e) ->
+    v = $('input#angle').val()
+    $('input#angle').val(--v)
+    e.preventDefault()
+  $('button#it-add').on 'click', (e) ->
+    v = $('input#iterations').val()
+    $('input#iterations').val(++v)
+    e.preventDefault()
+  $('button#it-minus').on 'click', (e) ->
+    v = $('input#iterations').val()
+    $('input#iterations').val(--v)
+    e.preventDefault()
+
   $('#toggleControls').on 'click', (e)->
     $('#controlPanel').slideToggle()
     e.preventDefault()

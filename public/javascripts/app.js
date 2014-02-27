@@ -262,6 +262,30 @@ formToOptions = function(formData) {
 oOptionsToForm = function(options) {};
 
 setUpControlPanel = function() {
+  $('button#deg-add').on('click', function(e) {
+    var v;
+    v = $('input#angle').val();
+    $('input#angle').val(++v);
+    return e.preventDefault();
+  });
+  $('button#deg-minus').on('click', function(e) {
+    var v;
+    v = $('input#angle').val();
+    $('input#angle').val(--v);
+    return e.preventDefault();
+  });
+  $('button#it-add').on('click', function(e) {
+    var v;
+    v = $('input#iterations').val();
+    $('input#iterations').val(++v);
+    return e.preventDefault();
+  });
+  $('button#it-minus').on('click', function(e) {
+    var v;
+    v = $('input#iterations').val();
+    $('input#iterations').val(--v);
+    return e.preventDefault();
+  });
   $('#toggleControls').on('click', function(e) {
     $('#controlPanel').slideToggle();
     return e.preventDefault();
@@ -604,7 +628,7 @@ module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partial
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n\n  <div id='controlPanel'>\n    <form id='params'>\n    <h3>Parameters</h3>\n\n      <table border=\"0\">\n\n        <tr>\n          <td><label>Favorite Settings:</label></td>\n          <td><select name=\"preDefined\" id=\"preDefined\">\n            <option value=\"sierpinksiTriangle\">sierpinksi triangle</option>\n            <option value=\"dragon\">dragon</option>\n            <option value=\"plant\">plant</option>\n            <option value=\"kochCurve\">koch curve</option>\n        </select></td>\n        </tr>\n\n        <tr>\n          <td> <label>Angle:</label> </td>\n          <td>\n            <input type=\"text\" name=\"angle\" value=\"30\" id=\"angle\">\n            <select>\n              <option value=\"degrees\">deg</option>\n              <option value=\"radians\">rad</option>\n            </select> \n            <span><button>+</button><button>-</button></span>\n          </td>\n        </tr>\n\n        <tr>\n          <td> <label>Iterations:</label> </td>\n          <td>\n            <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n            <span><button>+</button><button>-</button></span>\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Initial string:</label> </td>\n          <td>\n            <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n          </td>\n        </tr>\n\n        <tr>\n          <td> <label>Rule 1:</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r1_output\" value=\"Fr[[X]lX]lF[lFX]rX\" id=\"r1_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Rule 2:</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r2_input\" value=\"F\" id=\"r2_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r2_output\" value=\"FF\" id=\"r2_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td> <label>Rule 3:</label> </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r3_input\" value=\"\" id=\"r3_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r3_output\" value=\"\" id=\"r3_output\">\n          </td>\n        </tr>\n\n\n      </table>\n      <button id='submit'>\n        Draw\n          <span class=\"black-pencil\"></span>\n      </button>\n    </form>\n\n  </div>\n\n  <div id='info'>\n    <span>generating...</span>\n    <span id='toggleControls' class=\"icon-settings\"></span>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
+  return "<div id=\"content\">\n\n  <div id='controlPanel'>\n    <form id='params'>\n    <h3>Parameters</h3>\n\n      <table>\n\n        <tr>\n          <td>Favorites:</td>\n          <td><select name=\"preDefined\" id=\"preDefined\">\n            <option value=\"sierpinksiTriangle\">sierpinksi triangle</option>\n            <option value=\"dragon\">dragon</option>\n            <option value=\"plant\">plant</option>\n            <option value=\"kochCurve\">koch curve</option>\n        </select></td>\n        </tr>\n\n        <tr>\n          <td>Angle: </td>\n          <td>\n            <input type=\"text\" name=\"angle\" value=\"30\" id=\"angle\">\n            <select>\n              <option value=\"degrees\">deg</option>\n              <option value=\"radians\">rad</option>\n            </select> \n            <span>\n              <button id='deg-add'>+</button>\n              <button id='deg-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n\n        <tr>\n          <td>Iterations: </td>\n          <td>\n            <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n            <span>\n              <button id='it-add'>+</button>\n              <button id='it-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Initial string: </td>\n          <td>\n            <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n          </td>\n        </tr>\n\n        <tr>\n          <td>Rule 1: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r1_output\" value=\"Fr[[X]lX]lF[lFX]rX\" id=\"r1_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 2: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r2_input\" value=\"F\" id=\"r2_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r2_output\" value=\"FF\" id=\"r2_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 3: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r3_input\" value=\"\" id=\"r3_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r3_output\" value=\"\" id=\"r3_output\">\n          </td>\n        </tr>\n\n\n      </table>\n      <button id='submit'>\n        Draw\n          <span class=\"black-pencil\"></span>\n      </button>\n    </form>\n\n  </div>\n\n  <div id='info'>\n    <span>generating...</span>\n    <span id='toggleControls' class=\"icon-settings\"></span>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
 });
 
 ;require.register("views/view", function(exports, require, module) {
