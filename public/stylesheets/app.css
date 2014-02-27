@@ -71,8 +71,7 @@ canvas {
   background: #000;
 }
 #controlPanel {
-  display: none;
-  position: fixed;
+  position: absolute;
   background: rgba(255,255,255,0.7);
   padding: 10px;
   font-size: 16px;
@@ -82,7 +81,7 @@ canvas {
   margin: 0 auto;
   -webkit-box-shadow: 7px 7px 5px rgba(255,255,255,0.2);
   box-shadow: 7px 7px 5px rgba(255,255,255,0.2);
-  top: 60px;
+  top: 58px;
 }
 #controlPanel h3 {
   margin: 0 0 8px 0;
@@ -105,6 +104,11 @@ input.output {
 input[type=submit] {
   margin: 0 auto 0 140px;
 }
+form #submit {
+  width: 100px;
+  height: 60px;
+  padding: 20px;
+}
 #controlPanelHandle {
   text-align: right;
 }
@@ -126,6 +130,21 @@ input[type=submit] {
 }
 a {
   float: right;
+}
+[class*="black-"] {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-image: url("../images/sprites_black.png");
+  background-repeat: no-repeat;
+}
+.black-pencil {
+  background-position: -240px 0;
+  width: 32px;
+}
+.black-pencil2 {
+  background-position: -288px 0;
+  width: 32px;
 }
 [class*="icon-"] {
   display: inline-block;

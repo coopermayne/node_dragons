@@ -19,10 +19,10 @@
         <tr>
           <td> <label>Angle:</label> </td>
           <td>
-            <input type="text" name="angle" value="&pi;/6" id="angle">
+            <input type="text" name="angle" value="30" id="angle">
             <select>
-              <option value="radians">rad</option>
               <option value="degrees">deg</option>
+              <option value="radians">rad</option>
             </select> 
             <span><button>+</button><button>-</button></span>
           </td>
@@ -72,7 +72,10 @@
 
 
       </table>
-      <input type="submit" value="Generate Graphic">
+      <button id='submit'>
+        Draw
+          <span class="black-pencil"></span>
+      </button>
     </form>
 
   </div>

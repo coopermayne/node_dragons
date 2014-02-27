@@ -9,22 +9,57 @@ $(document).ready ->
   #TODO connect with form
   t = new Turtle(plant)
 
+  setUpControlPanel()
+
+  #$('canvas').on 'click', ->
+    #console.log 'something'
+    #t.drawNextIteration()
+
+formToOptions = (formData) ->
+  #takes in the form data and returns options ready for turtle
+  options =
+    startingString: null
+    iterations: null
+    angle: null
+    rules: [
+    ]
+  f = $('form').serializeArray()
+  formHash = {}
+  for param in f
+    formHash[param.name] = param.value
+  formHash = validateAndCleanForm(formHash)
+  console.log formHash
+
+  options.startingString = formHash.startingString
+  options.iterations = formHash.iterations
+  options.angle = formHash.angle
+  options.rules[0] = {input: formHash.r1_input, output: formHash.r1_output}
+  options.rules[1] = {input: formHash.r2_input, output: formHash.r2_output}
+  options.rules[2] = {input: formHash.r3_input, output: formHash.r3_output}
+
+  options
+
+oOptionsToForm = (options) ->
+  #takes in options and inserts them into for fields...
+  
+setUpControlPanel = ->
+  #show control panel
   $('#toggleControls').on 'click', (e)->
     $('#controlPanel').slideToggle()
     e.preventDefault()
-
-  $('canvas').on 'click', (e)->
-    t.drawNextIteration()
-
-  $('button').on 'click', ->
-    t.drawNextIteration()
+  
+  $('form').on 'submit', (e) ->
+    options = formToOptions()
+    t = new Turtle(options)
+    $('#controlPanel').slideUp()
+    e.preventDefault()
 
 class Turtle
   constructor: (options) ->
     @startingString = options.startingString
     @rules = options.rules
     @iterations = options.iterations
-    @d_radians = options.angle
+    @d_radians = options.angle * (2*Math.PI/360)
     @distance = 5
     @distanceMultiplier = options.distanceMultiplier || 1
     @canvas = document.getElementById('canvas')
@@ -43,13 +78,11 @@ class Turtle
     @points = [$.extend( true, {}, @pos )]
 
     #now we actually draw the thing
-    customTimer(this.generateString, 'generate string', this)
-    #console.log 'STRING: ' + @string
-    customTimer(this.readString, 'find points', this) #gets an array of points that make up the shape
-    #console.log 'POINTS: ' + @points.length
-    #console.log @points
+    @context.clearRect(0,0,@canvas.width,@canvas.height)
+    this.generateString()
+    this.readString() #gets an array of points that make up the shape
     this.resizeCanvas()  #resize the canvas to fit shape
-    customTimer(this.draw, 'drawAnimate', this)
+    this.draw()
   generateString: ->
     num = @iterations
 
@@ -132,6 +165,8 @@ class Turtle
         ctx.lineTo(point.x,point.y)
 
     ctx.stroke()
+    
+    this.resetTurtle()
 
   resetCanvas: ->
     # undo the transformations that you made when
@@ -139,8 +174,9 @@ class Turtle
     # for next iteration
     @context.translate(-@lastTrans.x,-@lastTrans.y)
     @context.scale(1/@scaler, 1/@scaler)
-    @context.clearRect(0,0,@canvas.width,@canvas.height)
 
+  resetTurtle: ->
+    this.resetCanvas()
     #reset variables for next iteration...
     @string = this.startingString
     @max = {x:0, y:0}
@@ -178,7 +214,7 @@ class Turtle
     @lastTrans.y = dy
     @context.translate(dx, dy)
   drawNextIteration: ->
-    this.resetCanvas()
+    @context.clearRect(0,0,@canvas.width,@canvas.height)
 
     @iterations++
     customTimer(this.generateString, 'generate string', this)
@@ -205,7 +241,7 @@ sierpinksiTriangle =
     {input:'B', output:'ArFBrFA'}
   ]
   iterations: 2
-  angle: Math.PI/3
+  angle: 60
 dragon =
   startingString:  "FX"
   rules: [
@@ -213,7 +249,7 @@ dragon =
     {input:'Y', output:'rFXrY'}
   ]
   iterations: 2
-  angle: Math.PI/2
+  angle: 90
   #distanceMultiplier: 1.0005
 plant =
   startingString: 'FX'
@@ -222,7 +258,7 @@ plant =
     {input:'F', output:'FF'}
   ]
   iterations: 7
-  angle: Math.PI/6
+  angle: 30
 
 kochCurve =
   startingString: 'FrrFrrF'
@@ -230,7 +266,7 @@ kochCurve =
     {input:'F', output:'FlFrrFlF'}
   ]
   iterations: 1
-  angle: Math.PI/3 + 0.45
+  angle: 60 + 25.8
 
 
 # color option (for curiosity's sake
@@ -247,3 +283,5 @@ kochCurve =
 #else if i == 2*Math.round @points.length/3
   #changeColor('white', ctx)
 
+validateAndCleanForm = (formData)->
+  formData
