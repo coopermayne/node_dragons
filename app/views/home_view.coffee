@@ -23,6 +23,8 @@ formToOptions = (formData) ->
   for param in f
     formHash[param.name] = param.value
   formHash = validateAndCleanForm(formHash)
+  if formHash == false
+    return alert 'bad params son!'
 
   options.startingString = formHash.startingString
   options.iterations = formHash.iterations
@@ -45,8 +47,6 @@ selectToForm = (preSetSel) ->
   $('#r2_output').val(opt.rules[1].output)
   $('#r3_input').val(opt.rules[2].input)
   $('#r3_output').val(opt.rules[2].output)
-
-  console.log opt
 
 setUpControlPanel = ->
   #show control panel
@@ -327,4 +327,26 @@ preSettingsArray =
   #changeColor('white', ctx)
 
 validateAndCleanForm = (formData)->
-  formData
+  # turn strings to numbers
+  cleanedFormData = {}
+  formData.angle = parseInt formData.angle
+  formData.iterations = parseInt formData.iterations
+
+  if (typeof formData.angle)=='number'
+    cleanedFormData.angle = formData.angle
+  else
+    return false
+  if (typeof formData.iterations)=='number' and formData.iterations > 0 and formData.iterations < 15
+    cleanedFormData.iterations = formData.iterations
+  else
+    return false
+
+  cleanedFormData.startingString = formData.startingString.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r1_input = formData.r1_input.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r2_input = formData.r2_input.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r3_input = formData.r3_input.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r1_output = formData.r1_output.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r2_output = formData.r2_output.replace /[^FXYlr\[\]]/, ''
+  cleanedFormData.r3_output = formData.r3_output.replace /[^FXYlr\[\]]/, ''
+
+  cleanedFormData
