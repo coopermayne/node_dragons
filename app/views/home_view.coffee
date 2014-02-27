@@ -283,7 +283,7 @@ dragon =
     {input:'Y', output:'rFXrY'}
     {input: null, output: null}
   ]
-  iterations: 6
+  iterations: 9
   angle: 90
   #distanceMultiplier: 1.0005
 plant =

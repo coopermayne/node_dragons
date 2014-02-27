@@ -617,7 +617,7 @@ dragon = {
       output: null
     }
   ],
-  iterations: 6,
+  iterations: 9,
   angle: 90
 };
 
