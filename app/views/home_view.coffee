@@ -44,6 +44,9 @@ oOptionsToForm = (options) ->
   
 setUpControlPanel = ->
   #show control panel
+  $('#help').on 'click', (e) ->
+    alert 'no help for you!'
+    e.preventDefault()
   $('button#deg-add').on 'click', (e) ->
     v = $('input#angle').val()
     $('input#angle').val(++v)
