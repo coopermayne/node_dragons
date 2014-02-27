@@ -8,12 +8,7 @@ module.exports = class HomeView extends View
 $(document).ready ->
   #TODO connect with form
   t = new Turtle(plant)
-
   setUpControlPanel()
-
-  #$('canvas').on 'click', ->
-    #console.log 'something'
-    #t.drawNextIteration()
 
 formToOptions = (formData) ->
   #takes in the form data and returns options ready for turtle
@@ -28,7 +23,6 @@ formToOptions = (formData) ->
   for param in f
     formHash[param.name] = param.value
   formHash = validateAndCleanForm(formHash)
-  console.log formHash
 
   options.startingString = formHash.startingString
   options.iterations = formHash.iterations
@@ -39,11 +33,40 @@ formToOptions = (formData) ->
 
   options
 
-oOptionsToForm = (options) ->
+selectToForm = (preSetSel) ->
   #takes in options and inserts them into for fields...
-  
+  opt = preSettingsArray[preSetSel]
+  $('input#angle').val(opt.angle)
+  $('input#iterations').val(opt.iterations)
+  $('input#startingString').val(opt.startingString)
+  $('#r1_input').val(opt.rules[0].input)
+  $('#r1_output').val(opt.rules[0].output)
+  $('#r2_input').val(opt.rules[1].input)
+  $('#r2_output').val(opt.rules[1].output)
+  $('#r3_input').val(opt.rules[2].input)
+  $('#r3_output').val(opt.rules[2].output)
+
+  console.log opt
+
 setUpControlPanel = ->
   #show control panel
+  $('#toggleControls').on 'click', (e)->
+    $('#controlPanel').slideToggle()
+    e.preventDefault()
+
+  $('form').on 'submit', (e) ->
+    options = formToOptions()
+    t = new Turtle(options)
+    $('#controlPanel').slideUp()
+    e.preventDefault()
+
+  #set up preset param choices events
+  $('#preDefined').on 'change', (e)->
+    preSettingSel = $('#preDefined').val()
+    selectToForm(preSettingSel) unless preSettingSel=='custom'
+    e.preventDefault()
+
+  #set up form click events
   $('#help').on 'click', (e) ->
     alert 'no help for you!'
     e.preventDefault()
@@ -62,16 +85,6 @@ setUpControlPanel = ->
   $('button#it-minus').on 'click', (e) ->
     v = $('input#iterations').val()
     $('input#iterations').val(--v)
-    e.preventDefault()
-
-  $('#toggleControls').on 'click', (e)->
-    $('#controlPanel').slideToggle()
-    e.preventDefault()
-  
-  $('form').on 'submit', (e) ->
-    options = formToOptions()
-    t = new Turtle(options)
-    $('#controlPanel').slideUp()
     e.preventDefault()
 
 class Turtle
@@ -259,16 +272,18 @@ sierpinksiTriangle =
   rules:[
     {input:'A', output:'BlFAlFB'}
     {input:'B', output:'ArFBrFA'}
+    {input: null, output: null}
   ]
-  iterations: 2
+  iterations: 6
   angle: 60
 dragon =
   startingString:  "FX"
   rules: [
     {input:'X', output:'XlYFl'}
     {input:'Y', output:'rFXrY'}
+    {input: null, output: null}
   ]
-  iterations: 2
+  iterations: 6
   angle: 90
   #distanceMultiplier: 1.0005
 plant =
@@ -276,6 +291,7 @@ plant =
   rules:[
     {input:'X', output:'Fr[[X]lX]lF[lFX]rX'}
     {input:'F', output:'FF'}
+    {input: null, output: null}
   ]
   iterations: 7
   angle: 30
@@ -284,10 +300,17 @@ kochCurve =
   startingString: 'FrrFrrF'
   rules: [
     {input:'F', output:'FlFrrFlF'}
+    {input: null, output: null}
+    {input: null, output: null}
   ]
-  iterations: 1
+  iterations: 8
   angle: 60 + 25.8
 
+preSettingsArray =
+  'dragon': dragon
+  'sierpinksiTriangle': sierpinksiTriangle
+  'plant': plant
+  'kochCurve': kochCurve
 
 # color option (for curiosity's sake
 #changeColor = (color, ctx)->

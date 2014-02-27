@@ -71,7 +71,6 @@ canvas {
   background: #000;
 }
 #controlPanel {
-  display: none;
   position: absolute;
   background: rgba(255,255,255,0.7);
   padding: 10px;
@@ -80,8 +79,8 @@ canvas {
   right: 0;
   left: 0;
   margin: 0 auto;
-  -webkit-box-shadow: 5px 5px 6px 3px rgba(255,255,255,0.2);
-  box-shadow: 5px 5px 6px 3px rgba(255,255,255,0.2);
+  -webkit-box-shadow: 5px 5px 10px 1px rgba(255,255,255,0.2);
+  box-shadow: 5px 5px 10px 1px rgba(255,255,255,0.2);
   top: 58px;
 }
 #controlPanel h3 {

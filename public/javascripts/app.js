@@ -194,7 +194,7 @@ module.exports = Model = (function(_super) {
 });
 
 ;require.register("views/home_view", function(exports, require, module) {
-var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, formToOptions, kochCurve, oOptionsToForm, plant, setUpControlPanel, sierpinksiTriangle, template, validateAndCleanForm,
+var HomeView, Turtle, View, customTimeInterval, customTimer, dragon, formToOptions, kochCurve, plant, preSettingsArray, selectToForm, setUpControlPanel, sierpinksiTriangle, template, validateAndCleanForm,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -240,7 +240,6 @@ formToOptions = function(formData) {
     formHash[param.name] = param.value;
   }
   formHash = validateAndCleanForm(formHash);
-  console.log(formHash);
   options.startingString = formHash.startingString;
   options.iterations = formHash.iterations;
   options.angle = formHash.angle;
@@ -259,9 +258,41 @@ formToOptions = function(formData) {
   return options;
 };
 
-oOptionsToForm = function(options) {};
+selectToForm = function(preSetSel) {
+  var opt;
+  opt = preSettingsArray[preSetSel];
+  $('input#angle').val(opt.angle);
+  $('input#iterations').val(opt.iterations);
+  $('input#startingString').val(opt.startingString);
+  $('#r1_input').val(opt.rules[0].input);
+  $('#r1_output').val(opt.rules[0].output);
+  $('#r2_input').val(opt.rules[1].input);
+  $('#r2_output').val(opt.rules[1].output);
+  $('#r3_input').val(opt.rules[2].input);
+  $('#r3_output').val(opt.rules[2].output);
+  return console.log(opt);
+};
 
 setUpControlPanel = function() {
+  $('#toggleControls').on('click', function(e) {
+    $('#controlPanel').slideToggle();
+    return e.preventDefault();
+  });
+  $('form').on('submit', function(e) {
+    var options, t;
+    options = formToOptions();
+    t = new Turtle(options);
+    $('#controlPanel').slideUp();
+    return e.preventDefault();
+  });
+  $('#preDefined').on('change', function(e) {
+    var preSettingSel;
+    preSettingSel = $('#preDefined').val();
+    if (preSettingSel !== 'custom') {
+      selectToForm(preSettingSel);
+    }
+    return e.preventDefault();
+  });
   $('#help').on('click', function(e) {
     alert('no help for you!');
     return e.preventDefault();
@@ -284,21 +315,10 @@ setUpControlPanel = function() {
     $('input#iterations').val(++v);
     return e.preventDefault();
   });
-  $('button#it-minus').on('click', function(e) {
+  return $('button#it-minus').on('click', function(e) {
     var v;
     v = $('input#iterations').val();
     $('input#iterations').val(--v);
-    return e.preventDefault();
-  });
-  $('#toggleControls').on('click', function(e) {
-    $('#controlPanel').slideToggle();
-    return e.preventDefault();
-  });
-  return $('form').on('submit', function(e) {
-    var options, t;
-    options = formToOptions();
-    t = new Turtle(options);
-    $('#controlPanel').slideUp();
     return e.preventDefault();
   });
 };
@@ -572,9 +592,12 @@ sierpinksiTriangle = {
     }, {
       input: 'B',
       output: 'ArFBrFA'
+    }, {
+      input: null,
+      output: null
     }
   ],
-  iterations: 2,
+  iterations: 6,
   angle: 60
 };
 
@@ -587,9 +610,12 @@ dragon = {
     }, {
       input: 'Y',
       output: 'rFXrY'
+    }, {
+      input: null,
+      output: null
     }
   ],
-  iterations: 2,
+  iterations: 6,
   angle: 90
 };
 
@@ -602,6 +628,9 @@ plant = {
     }, {
       input: 'F',
       output: 'FF'
+    }, {
+      input: null,
+      output: null
     }
   ],
   iterations: 7,
@@ -614,10 +643,23 @@ kochCurve = {
     {
       input: 'F',
       output: 'FlFrrFlF'
+    }, {
+      input: null,
+      output: null
+    }, {
+      input: null,
+      output: null
     }
   ],
-  iterations: 1,
+  iterations: 8,
   angle: 60 + 25.8
+};
+
+preSettingsArray = {
+  'dragon': dragon,
+  'sierpinksiTriangle': sierpinksiTriangle,
+  'plant': plant,
+  'kochCurve': kochCurve
 };
 
 validateAndCleanForm = function(formData) {
@@ -632,7 +674,7 @@ module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partial
   var foundHelper, self=this;
 
 
-  return "<div id=\"content\">\n\n  <div id='controlPanel'>\n    <form id='params'>\n      <h3>Parameters<span id='help'>help</span></h3>\n      <table>\n\n        <tr>\n          <td>Favorites:</td>\n          <td><select name=\"preDefined\" id=\"preDefined\">\n            <option value=\"sierpinksiTriangle\">sierpinksi triangle</option>\n            <option value=\"dragon\">dragon</option>\n            <option value=\"plant\">plant</option>\n            <option value=\"kochCurve\">koch curve</option>\n        </select></td>\n        </tr>\n\n        <tr>\n          <td>Angle: </td>\n          <td>\n            <input type=\"text\" name=\"angle\" value=\"30\" id=\"angle\">\n            <select>\n              <option value=\"degrees\">deg</option>\n              <option value=\"radians\">rad</option>\n            </select> \n            <span>\n              <button id='deg-add'>+</button>\n              <button id='deg-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n\n        <tr>\n          <td>Iterations: </td>\n          <td>\n            <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n            <span>\n              <button id='it-add'>+</button>\n              <button id='it-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Initial string: </td>\n          <td>\n            <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n          </td>\n        </tr>\n\n        <tr>\n          <td>Rule 1: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r1_output\" value=\"Fr[[X]lX]lF[lFX]rX\" id=\"r1_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 2: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r2_input\" value=\"F\" id=\"r2_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r2_output\" value=\"FF\" id=\"r2_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 3: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r3_input\" value=\"\" id=\"r3_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r3_output\" value=\"\" id=\"r3_output\">\n          </td>\n        </tr>\n\n\n      </table>\n      <button id='submit'>\n        Draw\n          <span class=\"black-pencil\"></span>\n      </button>\n    </form>\n\n  </div>\n\n  <div id='info'>\n    <span>generating...</span>\n    <!--<span id='prevIteration' class=\"icon-settings\"></span>-->\n    <!--<span id='nextIteration' class=\"icon-settings\"></span>-->\n    <span id='toggleControls' class=\"icon-settings\"></span>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
+  return "<div id=\"content\">\n\n  <div id='controlPanel'>\n    <form id='params'>\n      <h3>Parameters<span id='help'>help</span></h3>\n      <table>\n\n        <tr>\n          <td>Favorites:</td>\n          <td><select name=\"preDefined\" id=\"preDefined\">\n            <option value=\"custom\">Custom Settings</option>\n            <option value=\"sierpinksiTriangle\">Sierpinksi Triangle</option>\n            <option value=\"dragon\">Dragon</option>\n            <option value=\"plant\">Plant</option>\n            <option value=\"kochCurve\">Koch Curve</option>\n        </select></td>\n        </tr>\n\n        <tr>\n          <td>Angle: </td>\n          <td>\n            <input type=\"text\" name=\"angle\" value=\"30\" id=\"angle\">\n            <select>\n              <option value=\"degrees\">deg</option>\n              <option value=\"radians\">rad</option>\n            </select> \n            <span>\n              <button id='deg-add'>+</button>\n              <button id='deg-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n\n        <tr>\n          <td>Iterations: </td>\n          <td>\n            <input type=\"text\" name=\"iterations\" value=\"5\" id=\"iterations\">\n            <span>\n              <button id='it-add'>+</button>\n              <button id='it-minus'>-</button>\n            </span>\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Initial string: </td>\n          <td>\n            <input type=\"text\" name=\"startingString\" value=\"FX\" id=\"startingString\">\n          </td>\n        </tr>\n\n        <tr>\n          <td>Rule 1: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r1_input\" value=\"X\" id=\"r1_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r1_output\" value=\"Fr[[X]lX]lF[lFX]rX\" id=\"r1_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 2: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r2_input\" value=\"F\" id=\"r2_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r2_output\" value=\"FF\" id=\"r2_output\">\n          </td>\n        </tr>\n        \n        <tr>\n          <td>Rule 3: </td>\n          <td>\n            <input class='input' type=\"text\" name=\"r3_input\" value=\"\" id=\"r3_input\">\n            &rarr;\n            <input class='output' type=\"text\" name=\"r3_output\" value=\"\" id=\"r3_output\">\n          </td>\n        </tr>\n\n\n      </table>\n      <button id='submit'>\n        Draw\n          <span class=\"black-pencil\"></span>\n      </button>\n    </form>\n\n  </div>\n\n  <div id='info'>\n    <span>generating...</span>\n    <!--<span id='prevIteration' class=\"icon-settings\"></span>-->\n    <!--<span id='nextIteration' class=\"icon-settings\"></span>-->\n    <span id='toggleControls' class=\"icon-settings\"></span>\n  </div>\n\n  <canvas id=\"canvas\" width=\"700\" height=\"700\"></canvas>\n\n</div>\n";});
 });
 
 ;require.register("views/view", function(exports, require, module) {
